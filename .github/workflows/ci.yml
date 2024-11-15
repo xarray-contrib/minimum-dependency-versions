@@ -5,11 +5,16 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     name: tests
     runs-on: [ubuntu-latest]
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
@@ -36,16 +41,51 @@ jobs:
     runs-on: [ubuntu-latest]
 
     strategy:
+      fail-fast: false
       matrix:
         env-paths:
           - ["envs/env1.yaml"]
           - ["envs/env2.yaml"]
           - ["envs/env1.yaml", "envs/env2.yaml"]
+        expected-failure: ["false"]
+        include:
+          - env-paths: ["envs/failing-env1.yaml"]
+            expected-failure: "true"
+          - env-paths: ["envs/env1.yaml", "envs/failing-env1.yaml"]
+            expected-failure: "true"
 
     steps:
       - name: clone the repository
         uses: actions/checkout@v4
       - name: run action
         uses: ./
+        id: action-run
+        continue-on-error: true
         with:
-          environment-paths: ${{ matrix.env-paths }}
+          environment-paths: "${{ toJSON(matrix.env-paths) }}"
+      - name: detect outcome
+        if: always()
+        shell: bash -l {0}
+        run: |
+          if [[ "${{ steps.action-run.outcome }}" == "success" && ${{ matrix.expected-failure }} == "true" ]]; then
+              # unexpected pass
+              echo "workflow xpassed"
+              export STATUS=1
+          elif [[ "${{ steps.action-run.outcome }}" == "failure" && ${{ matrix.expected-failure }} == "false" ]]; then
+              # unexpected failure
+              echo "workflow failed"
+              export STATUS=2
+          elif [[ "${{ steps.action-run.outcome }}" == "success" && ${{ matrix.expected-failure }} == "false" ]]; then
+              # normal pass
+              echo "workflow passed"
+              export STATUS=0
+          elif [[ "${{ steps.action-run.outcome }}" == "failure" && ${{ matrix.expected-failure }} == "true" ]]; then
+              # expected failure
+              echo "workflow xfailed"
+              export STATUS=0
+          else
+              # cancelled
+              echo "workflow cancelled"
+              export STATUS=3
+          fi
+          exit $STATUS

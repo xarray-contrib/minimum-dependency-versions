@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.23
+  - xarray=2023.10.0
+  - dask=2023.10.0
+  - distributed=2023.10.0
