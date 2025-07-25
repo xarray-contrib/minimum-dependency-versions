@@ -22,13 +22,14 @@ channels = ["conda-forge"]
 platforms = ["noarch", "linux-64"]
 ignored_packages = [
     "coveralls",
+    "hypothesis",
     "pip",
     "pytest",
     "pytest-cov",
     "pytest-env",
-    "pytest-xdist",
+    "pytest-mypy-plugins",
     "pytest-timeout",
-    "hypothesis",
+    "pytest-xdist",
 ]
 
 
