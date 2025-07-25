@@ -1,1 +1,3 @@
 .prettier_cache
+
+__pycache__/
