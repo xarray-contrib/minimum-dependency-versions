@@ -67,6 +67,7 @@ jobs:
         id: action-run
         continue-on-error: true
         with:
+          policy: policy.yaml
           environment-paths: ${{ matrix.env-paths }}
       - name: detect outcome
         if: always()
