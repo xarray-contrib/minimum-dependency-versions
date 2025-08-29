@@ -4,3 +4,5 @@ rich-click
 cytoolz
 pyyaml
 python-dateutil
+jsonschema
+rfc3339-validator

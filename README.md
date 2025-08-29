@@ -4,7 +4,35 @@ Check that the minimum dependency versions follow `xarray`'s policy.
 
 ## Usage
 
-To use the `minimum-dependency-versions` action in workflows, simply add a new step:
+To use the `minimum-dependency-versions` action in workflows, create a policy file (`policy.yaml`):
+
+```yaml
+channels:
+  - conda-forge
+platforms:
+  - noarch
+  - linux-64
+policy:
+  # policy in months
+  # Example is xarray's values
+  packages:
+    python: 30
+    numpy: 18
+  default: 12
+  overrides:
+    # override the policy for specific packages
+    package3: 0.3.1
+  # these packages are completely ignored
+  exclude:
+    - package1
+    - package2
+    - ...
+  # these packages don't fail the CI, but will be printed in the report as a warning
+  ignored_violations:
+    - package4
+```
+
+then add a new step to CI:
 
 ```yaml
 jobs:
@@ -14,6 +42,7 @@ jobs:
     ...
     - uses: xarray-contrib/minimum-dependency-versions@version
       with:
+        policy: policy.yaml
         environment-paths: path/to/env.yaml
 ```
 

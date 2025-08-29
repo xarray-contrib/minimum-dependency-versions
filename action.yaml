@@ -2,11 +2,21 @@ name: "minimum-dependency-versions"
 description: >-
   Check that the minimum dependency versions follow `xarray`'s policy.
 inputs:
+  policy:
+    description: >-
+      The path to the policy to follow
+    required: true
+    type: string
   environment-paths:
     description: >-
       The paths to the environment files
-    required: True
+    required: true
     type: list
+  today:
+    description: >-
+      Time machine for testing
+    required: false
+    type: string
 outputs: {}
 
 runs:
@@ -16,12 +26,16 @@ runs:
     - name: install dependencies
       shell: bash -l {0}
       run: |
+        echo "::group::Install dependencies"
         python -m pip install -r ${{ github.action_path }}/requirements.txt
+        echo "::endgroup::"
     - name: analyze environments
       shell: bash -l {0}
       env:
         COLUMNS: 120
         FORCE_COLOR: 3
-        INPUT: ${{ inputs.environment-paths }}
+        POLICY_PATH: ${{ inputs.policy }}
+        ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
+        TODAY: ${{ inputs.today }}
       run: |
-        python ${{ github.action_path }}/minimum_versions.py $(echo $INPUT)
+        python minimum_versions.py --today="$TODAY" --policy="$POLICY_PATH" $ENVIRONMENT_PATHS

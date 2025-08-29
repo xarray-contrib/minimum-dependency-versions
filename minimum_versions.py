@@ -5,6 +5,7 @@ import pathlib
 import sys
 from dataclasses import dataclass, field
 
+import jsonschema
 import rich_click as click
 import yaml
 from dateutil.relativedelta import relativedelta
@@ -18,26 +19,61 @@ from tlz.itertoolz import concat, groupby
 
 click.rich_click.SHOW_ARGUMENTS = True
 
-channels = ["conda-forge"]
-platforms = ["noarch", "linux-64"]
-ignored_packages = [
-    "coveralls",
-    "hypothesis",
-    "pip",
-    "pytest",
-    "pytest-cov",
-    "pytest-env",
-    "pytest-mypy-plugins",
-    "pytest-timeout",
-    "pytest-xdist",
-]
+
+schema = {
+    "type": "object",
+    "properties": {
+        "channels": {"type": "array", "items": {"type": "string"}},
+        "platforms": {"type": "array", "items": {"type": "string"}},
+        "policy": {
+            "type": "object",
+            "properties": {
+                "packages": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-z][-a-z_]*$": {"type": "integer", "minimum": 1}
+                    },
+                    "additionalProperties": False,
+                },
+                "default": {"type": "integer", "minimum": 1},
+                "overrides": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-z][-a-z_]*": {"type": "string", "format": "date"}
+                    },
+                    "additionalProperties": False,
+                },
+                "exclude": {"type": "array", "items": {"type": "string"}},
+                "ignored_violations": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^[a-z][-a-z_]*$"},
+                },
+            },
+            "required": [
+                "packages",
+                "default",
+                "overrides",
+                "exclude",
+                "ignored_violations",
+            ],
+        },
+    },
+    "required": ["channels", "platforms", "policy"],
+}
 
 
 @dataclass
 class Policy:
     package_months: dict
     default_months: int
+
+    channels: list[str] = field(default_factory=list)
+    platforms: list[str] = field(default_factory=list)
+
     overrides: dict[str, Version] = field(default_factory=dict)
+
+    ignored_violations: list[str] = field(default_factory=list)
+    exclude: list[str] = field(default_factory=list)
 
     def minimum_version(self, today, package_name, releases):
         if (override := self.overrides.get(package_name)) is not None:
@@ -117,6 +153,28 @@ def parse_environment(text):
     return specs, warnings
 
 
+def parse_policy(file):
+    policy = yaml.safe_load(file)
+    try:
+        jsonschema.validate(instance=policy, schema=schema)
+    except jsonschema.ValidationError as e:
+        raise jsonschema.ValidationError(
+            f"Invalid policy definition: {str(e)}"
+        ) from None
+
+    package_policy = policy["policy"]
+
+    return Policy(
+        channels=policy["channels"],
+        platforms=policy["platforms"],
+        exclude=package_policy["exclude"],
+        package_months=package_policy["packages"],
+        default_months=package_policy["default"],
+        ignored_violations=package_policy["ignored_violations"],
+        overrides=package_policy["overrides"],
+    )
+
+
 def is_preview(version):
     candidates = {"rc", "b", "a"}
 
@@ -175,11 +233,15 @@ def lookup_spec_release(spec, releases):
     return releases[spec.name][version]
 
 
-def compare_versions(environments, policy_versions):
+def compare_versions(environments, policy_versions, ignored_violations):
     status = {}
     for env, specs in environments.items():
         env_status = any(
-            spec.version > policy_versions[spec.name].version for spec in specs
+            (
+                spec.name not in ignored_violations
+                and spec.version > policy_versions[spec.name].version
+            )
+            for spec in specs
         )
         status[env] = env_status
     return status
@@ -194,7 +256,7 @@ def version_comparison_symbol(required, policy):
         return "="
 
 
-def format_bump_table(specs, policy_versions, releases, warnings):
+def format_bump_table(specs, policy_versions, releases, warnings, ignored_violations):
     table = Table(
         Column("Package", width=20),
         Column("Required", width=8),
@@ -221,7 +283,10 @@ def format_bump_table(specs, policy_versions, releases, warnings):
         required_date = lookup_spec_release(spec, releases).timestamp
 
         status = version_comparison_symbol(required_version, policy_version)
-        style = styles[status]
+        if status == ">" and spec.name in ignored_violations:
+            style = warning_style
+        else:
+            style = styles[status]
 
         table.add_row(
             spec.name,
@@ -255,14 +320,25 @@ def format_bump_table(specs, policy_versions, releases, warnings):
     return grid
 
 
+def parse_date(string):
+    if not string:
+        return None
+
+    return datetime.datetime.strptime(string, "%Y-%m-%d").date()
+
+
 @click.command()
 @click.argument(
     "environment_paths",
     type=click.Path(exists=True, readable=True, path_type=pathlib.Path),
     nargs=-1,
 )
-def main(environment_paths):
+@click.option("--today", type=parse_date, default=None)
+@click.option("--policy", "policy_file", type=click.File(mode="r"), required=True)
+def main(today, policy_file, environment_paths):
     console = Console()
+
+    policy = parse_policy(policy_file)
 
     parsed_environments = {
         path.stem: parse_environment(path.read_text()) for path in environment_paths
@@ -272,7 +348,7 @@ def main(environment_paths):
         env: dict(warnings_) for env, (_, warnings_) in parsed_environments.items()
     }
     environments = {
-        env: [spec for spec in specs if spec.name not in ignored_packages]
+        env: [spec for spec in specs if spec.name not in policy.exclude]
         for env, (specs, _) in parsed_environments.items()
     }
 
@@ -280,22 +356,14 @@ def main(environment_paths):
         dict.fromkeys(spec.name for spec in concat(environments.values()))
     )
 
-    policy_months = {
-        "python": 30,
-        "numpy": 18,
-    }
-    policy_months_default = 12
-    overrides = {}
-
-    policy = Policy(
-        policy_months, default_months=policy_months_default, overrides=overrides
-    )
-
     gateway = Gateway()
-    query = gateway.query(channels, platforms, all_packages, recursive=False)
+    query = gateway.query(
+        policy.channels, policy.platforms, all_packages, recursive=False
+    )
     records = asyncio.run(query)
 
-    today = datetime.date.today()
+    if today is None:
+        today = datetime.date.today()
     package_releases = pipe(
         records,
         concat,
@@ -307,13 +375,19 @@ def main(environment_paths):
         package_releases,
         curry(find_policy_versions, policy, today),
     )
-    status = compare_versions(environments, policy_versions)
+    status = compare_versions(environments, policy_versions, policy.ignored_violations)
 
     release_lookup = {
         n: {r.version: r for r in releases} for n, releases in package_releases.items()
     }
     grids = {
-        env: format_bump_table(specs, policy_versions, release_lookup, warnings[env])
+        env: format_bump_table(
+            specs,
+            policy_versions,
+            release_lookup,
+            warnings[env],
+            policy.ignored_violations,
+        )
         for env, specs in environments.items()
     }
     root_grid = Table.grid()

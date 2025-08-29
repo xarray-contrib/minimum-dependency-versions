@@ -67,7 +67,9 @@ jobs:
         id: action-run
         continue-on-error: true
         with:
+          policy: policy.yaml
           environment-paths: ${{ matrix.env-paths }}
+          today: 2024-12-20
       - name: detect outcome
         if: always()
         shell: bash -l {0}
