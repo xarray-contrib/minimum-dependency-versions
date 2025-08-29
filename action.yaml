@@ -28,5 +28,6 @@ runs:
         COLUMNS: 120
         FORCE_COLOR: 3
         POLICY_PATH: ${{ inputs.policy-path }}
+        ENVIRONMENT_PATHS: ${{ join(fromJSON(inputs.environment-paths), ' ') }}
       run: |
-        python minimum_versions.py --policy="$POLICY_PATH" ${{ join(fromJSON(inputs.environment-paths), ' ') }}
+        python minimum_versions.py --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
