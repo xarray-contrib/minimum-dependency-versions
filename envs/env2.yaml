@@ -7,4 +7,3 @@ dependencies:
   - dask=2023.10.0
   - distributed=2023.10.0
   - pydap=3.5.1
-  - netcdf4=1.7
