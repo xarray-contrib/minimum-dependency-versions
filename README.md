@@ -7,11 +7,6 @@ Check that the minimum dependency versions follow `xarray`'s policy.
 To use the `minimum-dependency-versions` action in workflows, create a policy file (`policy.yaml`):
 
 ```yaml
-# these packages are completely ignored
-exclude:
-  - package1
-  - package2
-  - ...
 channels:
   - conda-forge
 platforms:
@@ -27,6 +22,11 @@ policy:
   overrides:
     # override the policy for specific packages
     package3: 0.3.1
+  # these packages are completely ignored
+  exclude:
+    - package1
+    - package2
+    - ...
   # these packages don't fail the CI, but will be printed in the report as a warning
   ignored_violations:
     - package4

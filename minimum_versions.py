@@ -23,7 +23,6 @@ click.rich_click.SHOW_ARGUMENTS = True
 schema = {
     "type": "object",
     "properties": {
-        "exclude": {"type": "array", "items": {"type": "string"}},
         "channels": {"type": "array", "items": {"type": "string"}},
         "platforms": {"type": "array", "items": {"type": "string"}},
         "policy": {
@@ -44,15 +43,22 @@ schema = {
                     },
                     "additionalProperties": False,
                 },
+                "exclude": {"type": "array", "items": {"type": "string"}},
                 "ignored_violations": {
                     "type": "array",
                     "items": {"type": "string", "pattern": "^[a-z][-a-z_]*$"},
                 },
             },
-            "required": ["packages", "default", "overrides", "ignored_violations"],
+            "required": [
+                "packages",
+                "default",
+                "overrides",
+                "exclude",
+                "ignored_violations",
+            ],
         },
     },
-    "required": ["exclude", "channels", "platforms", "policy"],
+    "required": ["channels", "platforms", "policy"],
 }
 
 
@@ -161,7 +167,7 @@ def parse_policy(file):
     return Policy(
         channels=policy["channels"],
         platforms=policy["platforms"],
-        exclude=policy["exclude"],
+        exclude=package_policy["exclude"],
         package_months=package_policy["packages"],
         default_months=package_policy["default"],
         ignored_violations=package_policy["ignored_violations"],
