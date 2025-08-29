@@ -2,6 +2,11 @@ name: "minimum-dependency-versions"
 description: >-
   Check that the minimum dependency versions follow `xarray`'s policy.
 inputs:
+  policy:
+    description: >-
+      The policy to follow
+    required: True
+    type: string
   environment-paths:
     description: >-
       The paths to the environment files
@@ -22,6 +27,6 @@ runs:
       env:
         COLUMNS: 120
         FORCE_COLOR: 3
-        INPUT: ${{ inputs.environment-paths }}
+        POLICY_PATH: ${{ inputs.policy-path }}
       run: |
-        python ${{ github.action_path }}/minimum_versions.py $(echo $INPUT)
+        python minimum_versions.py --policy="$POLICY_PATH" ${{ join(fromJSON(inputs.environment-paths), ' ') }}
