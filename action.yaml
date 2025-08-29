@@ -30,4 +30,5 @@ runs:
         POLICY_PATH: ${{ inputs.policy-path }}
         ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
       run: |
+        env
         python minimum_versions.py --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
