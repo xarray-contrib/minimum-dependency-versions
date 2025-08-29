@@ -26,13 +26,6 @@ schema = {
         "exclude": {"type": "array", "items": {"type": "string"}},
         "channels": {"type": "array", "items": {"type": "string"}},
         "platforms": {"type": "array", "items": {"type": "string"}},
-        "overrides": {
-            "type": "object",
-            "patternProperties": {
-                "^[a-z][-a-z_]*": {"type": "string", "format": "date"}
-            },
-            "additionalProperties": False,
-        },
         "policy": {
             "type": "object",
             "properties": {
@@ -44,15 +37,22 @@ schema = {
                     "additionalProperties": False,
                 },
                 "default": {"type": "integer", "minimum": 1},
+                "overrides": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-z][-a-z_]*": {"type": "string", "format": "date"}
+                    },
+                    "additionalProperties": False,
+                },
                 "ignored_violations": {
                     "type": "array",
                     "items": {"type": "string", "pattern": "^[a-z][-a-z_]*$"},
                 },
             },
-            "required": ["packages", "default", "ignored_violations"],
+            "required": ["packages", "default", "overrides", "ignored_violations"],
         },
     },
-    "required": ["exclude", "channels", "platforms", "overrides"],
+    "required": ["exclude", "channels", "platforms", "policy"],
 }
 
 
@@ -165,7 +165,7 @@ def parse_policy(file):
         package_months=package_policy["packages"],
         default_months=package_policy["default"],
         ignored_violations=package_policy["ignored_violations"],
-        overrides=policy["overrides"],
+        overrides=package_policy["overrides"],
     )
 
 

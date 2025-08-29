@@ -15,14 +15,13 @@ channels:
 platforms:
   - noarch
   - linux-64
-# in case conda-forge release dates are not accurate enough
-overrides: {}
 policy:
   # all packages in months
   packages:
     python: 30
     numpy: 18
   default: 12
+  overrides: {}
   # these packages don't fail the CI, but will be printed in the report
   ignored_violations:
     - pydap
