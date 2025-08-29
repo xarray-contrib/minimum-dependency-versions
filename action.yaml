@@ -4,7 +4,7 @@ description: >-
 inputs:
   policy:
     description: >-
-      The policy to follow
+      The path to the policy to follow
     required: True
     type: string
   environment-paths:
