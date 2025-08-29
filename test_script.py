@@ -44,7 +44,7 @@ def test_spec_parse(text, expected_spec, expected_name, expected_warnings):
         ),
         (
             "scipy",
-            Policy({"numpy": 6}, 8, {"scipy": Version("1.1.1")}),
+            Policy({"numpy": 6}, 8, overrides={"scipy": Version("1.1.1")}),
             dt.date(2024, 9, 5),
             Release(Version("1.1.1"), 0, dt.datetime(2023, 12, 1)),
         ),
