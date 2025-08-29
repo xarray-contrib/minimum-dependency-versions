@@ -26,7 +26,9 @@ runs:
     - name: install dependencies
       shell: bash -l {0}
       run: |
+        echo "::group::Install dependencies"
         python -m pip install -r ${{ github.action_path }}/requirements.txt
+        echo "::endgroup::"
     - name: analyze environments
       shell: bash -l {0}
       env:
