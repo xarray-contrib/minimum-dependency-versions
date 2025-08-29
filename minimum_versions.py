@@ -230,7 +230,15 @@ def is_suitable_release(release):
 def lookup_spec_release(spec, releases):
     version = spec.version.extend_to_length(3)
 
-    return releases[spec.name][version]
+    compatible_versions = [
+        release
+        for v, release in releases[spec.name].items()
+        if v.compatible_with(version)
+    ]
+    if not compatible_versions:
+        return Release(version="", build_number=0, timestamp=datetime.date(1970, 1, 1))
+
+    return compatible_versions[0]
 
 
 def compare_versions(environments, policy_versions, ignored_violations):
