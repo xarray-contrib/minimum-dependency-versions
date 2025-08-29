@@ -1,3 +1,4 @@
+# these packages are completely ignored
 exclude:
   - coveralls
   - pip
@@ -22,5 +23,6 @@ policy:
     python: 30
     numpy: 18
   default: 12
+  # these packages don't fail the CI, but will be printed in the report
   ignored_violations:
     - pydap
