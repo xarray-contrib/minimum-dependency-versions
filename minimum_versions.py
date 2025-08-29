@@ -314,14 +314,19 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
     return grid
 
 
+def parse_date(string):
+    return datetime.datetime.strptime(string, "%Y-%m-%d").date()
+
+
 @click.command()
 @click.argument(
     "environment_paths",
     type=click.Path(exists=True, readable=True, path_type=pathlib.Path),
     nargs=-1,
 )
-@click.option("--policy", "policy_file", type=click.File(mode="r"))
-def main(policy_file, environment_paths):
+@click.option("--today", type=parse_date, default=None)
+@click.option("--policy", "policy_file", type=click.File(mode="r"), required=True)
+def main(today, policy_file, environment_paths):
     console = Console()
 
     policy = parse_policy(policy_file)
@@ -348,7 +353,8 @@ def main(policy_file, environment_paths):
     )
     records = asyncio.run(query)
 
-    today = datetime.date.today()
+    if today is None:
+        today = datetime.date.today()
     package_releases = pipe(
         records,
         concat,
