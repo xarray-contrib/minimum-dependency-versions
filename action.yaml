@@ -38,4 +38,4 @@ runs:
         ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
         TODAY: ${{ inputs.today }}
       run: |
-        python minimum_versions.py --today="$TODAY" --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
+        python ${{ github.action_path }}/minimum_versions.py --today="$TODAY" --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
