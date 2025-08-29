@@ -30,5 +30,6 @@ runs:
         POLICY_PATH: ${{ inputs.policy-path }}
         ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
       run: |
-        env
+        env | grep -i -e "environment"
+        env | grep -i -e "policy"
         python minimum_versions.py --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
