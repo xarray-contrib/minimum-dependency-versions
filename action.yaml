@@ -36,9 +36,4 @@ runs:
         ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
         TODAY: ${{ inputs.today }}
       run: |
-        if [[ "$TODAY" != "" ]]; then
-            opts=(--today="$TODAY")
-        else
-            opts=()
-        fi
-        python minimum_versions.py "$opts" --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
+        python minimum_versions.py --today="$TODAY" --policy="$POLICY_PATH" $ENVIRONMENT_PATHS

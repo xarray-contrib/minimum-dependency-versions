@@ -315,6 +315,9 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
 
 
 def parse_date(string):
+    if not string:
+        return None
+
     return datetime.datetime.strptime(string, "%Y-%m-%d").date()
 
 
