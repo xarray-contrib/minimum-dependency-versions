@@ -5,13 +5,18 @@ inputs:
   policy:
     description: >-
       The path to the policy to follow
-    required: True
+    required: true
     type: string
   environment-paths:
     description: >-
       The paths to the environment files
-    required: True
+    required: true
     type: list
+  today:
+    description: >-
+      Time machine for testing
+    required: false
+    type: string
 outputs: {}
 
 runs:

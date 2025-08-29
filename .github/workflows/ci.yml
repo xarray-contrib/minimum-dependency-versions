@@ -69,6 +69,7 @@ jobs:
         with:
           policy: policy.yaml
           environment-paths: ${{ matrix.env-paths }}
+          today: 2024-02-04
       - name: detect outcome
         if: always()
         shell: bash -l {0}
