@@ -1,0 +1,4 @@
+channels:
+  - conda-forge
+dependencies:
+  - package_no_version_not_in_exclude

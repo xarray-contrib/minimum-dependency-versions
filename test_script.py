@@ -1,9 +1,10 @@
 import datetime as dt
 
 import pytest
+import pathlib
 from rattler import Version
 
-from minimum_versions import Policy, Release, Spec
+from minimum_versions import Policy, Release, Spec, _main
 
 
 @pytest.mark.parametrize(
@@ -25,6 +26,25 @@ def test_spec_parse(text, expected_spec, expected_name, expected_warnings):
     assert actual_spec == expected_spec
     assert actual_name == expected_name
     assert actual_warnings == expected_warnings
+
+
+def test_error_missing_version_or_exclude():
+
+
+    msg = (
+        "No minimum version found for 'package_no_version_not_in_exclude' in"
+        " 'failing-env2'. Either add a version or add to the list of excluded packages"
+        " in the policy file."
+    )
+
+    with open("policy.yaml") as policy:
+
+        environment_paths = [pathlib.Path("envs/failing-env2.yaml")]
+
+        with pytest.raises(ValueError, match=msg):
+            _main(dt.date(2023, 12, 12), policy, environment_paths=environment_paths)
+
+
 
 
 @pytest.mark.parametrize(
@@ -72,3 +92,5 @@ def test_policy_minimum_version(package_name, policy, today, expected):
     actual = policy.minimum_version(today, package_name, releases[package_name])
 
     assert actual == expected
+
+
