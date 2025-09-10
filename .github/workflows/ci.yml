@@ -54,13 +54,16 @@ jobs:
         include:
           - env-paths: |
               envs/failing-env1.yaml
+            policy-file: "policy.yaml"
             expected-failure: "true"
           - env-paths: |
               envs/env1.yaml
               envs/failing-env1.yaml
+            policy-file: "policy.yaml"
             expected-failure: "true"
           - env-paths: "envs/env3.yaml"
             policy-file: policy_no_extra_options.yaml
+            expected-failure: "false"
 
     steps:
       - name: clone the repository
