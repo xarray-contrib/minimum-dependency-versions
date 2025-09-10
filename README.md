@@ -32,6 +32,16 @@ policy:
     - package4
 ```
 
+if there are no packages with `overrides`, `exclude`, or `ignored_violations`, you can set
+them to an empty dictionary or list, respectively:
+
+```yaml
+  ...
+  overrides: {}
+  exclude: []
+  ignored_violations: []
+```
+
 then add a new step to CI:
 
 ```yaml
