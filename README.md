@@ -32,8 +32,8 @@ policy:
     - package4
 ```
 
-if there are no packages with `overrides`, `exclude`, or `ignored_violations`, you can set
-them to an empty dictionary or list, respectively:
+If there are no packages with `overrides`, `exclude`, or `ignored_violations`, you can set
+them to an empty mapping or sequence, respectively:
 
 ```yaml
   ...
@@ -42,7 +42,7 @@ them to an empty dictionary or list, respectively:
   ignored_violations: []
 ```
 
-then add a new step to CI:
+Then add a new step to CI:
 
 ```yaml
 jobs:
