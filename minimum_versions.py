@@ -164,10 +164,9 @@ def assert_spec_has_version(environments):
                     f"No minimum version found for '{spec.name}' in '{env}'. Either"
                     " add a version or add to the list of excluded packages in the"
                     " policy file."
-                    )
+                )
 
                 raise ValueError(msg)
-
 
 
 def parse_policy(file):

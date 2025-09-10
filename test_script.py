@@ -1,7 +1,7 @@
 import datetime as dt
+import pathlib
 
 import pytest
-import pathlib
 from rattler import Version
 
 from minimum_versions import Policy, Release, Spec, _main
@@ -30,7 +30,6 @@ def test_spec_parse(text, expected_spec, expected_name, expected_warnings):
 
 def test_error_missing_version_or_exclude():
 
-
     msg = (
         "No minimum version found for 'package_no_version_not_in_exclude' in"
         " 'failing-env2'. Either add a version or add to the list of excluded packages"
@@ -43,8 +42,6 @@ def test_error_missing_version_or_exclude():
 
         with pytest.raises(ValueError, match=msg):
             _main(dt.date(2023, 12, 12), policy, environment_paths=environment_paths)
-
-
 
 
 @pytest.mark.parametrize(
@@ -92,5 +89,3 @@ def test_policy_minimum_version(package_name, policy, today, expected):
     actual = policy.minimum_version(today, package_name, releases[package_name])
 
     assert actual == expected
-
-
