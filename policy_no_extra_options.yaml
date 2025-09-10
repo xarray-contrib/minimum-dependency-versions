@@ -1,0 +1,11 @@
+channels:
+  - conda-forge
+platforms:
+  - noarch
+  - linux-64
+policy:
+  # all packages in months
+  packages:
+    python: 30
+    numpy: 18
+  default: 12

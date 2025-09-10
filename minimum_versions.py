@@ -52,9 +52,6 @@ schema = {
             "required": [
                 "packages",
                 "default",
-                "overrides",
-                "exclude",
-                "ignored_violations",
             ],
         },
     },
@@ -167,11 +164,11 @@ def parse_policy(file):
     return Policy(
         channels=policy["channels"],
         platforms=policy["platforms"],
-        exclude=package_policy["exclude"],
+        exclude=package_policy.get("exclude", {}),
         package_months=package_policy["packages"],
         default_months=package_policy["default"],
-        ignored_violations=package_policy["ignored_violations"],
-        overrides=package_policy["overrides"],
+        ignored_violations=package_policy.get("ignored_violations", {}),
+        overrides=package_policy.get("overrides", {}),
     )
 
 

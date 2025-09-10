@@ -50,6 +50,7 @@ jobs:
             envs/env1.yaml
             envs/env2.yaml
         expected-failure: ["false"]
+        policy-file: ["policy.yaml"]
         include:
           - env-paths: |
               envs/failing-env1.yaml
@@ -58,6 +59,8 @@ jobs:
               envs/env1.yaml
               envs/failing-env1.yaml
             expected-failure: "true"
+          - env-paths: "envs/env3.yaml"
+            policy-file: policy_no_extra_options.yaml
 
     steps:
       - name: clone the repository
@@ -67,7 +70,7 @@ jobs:
         id: action-run
         continue-on-error: true
         with:
-          policy: policy.yaml
+          policy: ${{ matrix.policy-file }}
           environment-paths: ${{ matrix.env-paths }}
           today: 2024-12-20
       - name: detect outcome
