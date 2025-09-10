@@ -32,7 +32,17 @@ policy:
     - package4
 ```
 
-then add a new step to CI:
+If there are no packages with `overrides`, `exclude`, or `ignored_violations`, you can set
+them to an empty mapping or sequence, respectively:
+
+```yaml
+  ...
+  overrides: {}
+  exclude: []
+  ignored_violations: []
+```
+
+Then add a new step to CI:
 
 ```yaml
 jobs:
