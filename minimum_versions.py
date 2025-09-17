@@ -31,7 +31,7 @@ schema = {
                 "packages": {
                     "type": "object",
                     "patternProperties": {
-                        "^[a-z][a-z0-9_]*$": {"type": "integer", "minimum": 1}
+                        "^[a-z][a-z0-9_-]*$": {"type": "integer", "minimum": 1}
                     },
                     "additionalProperties": False,
                 },
