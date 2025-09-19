@@ -175,13 +175,6 @@ def parse_policy(file):
     )
 
 
-def is_preview(version):
-    candidates = {"rc", "b", "a"}
-
-    *_, last_segment = version.segments()
-    return any(candidate in last_segment for candidate in candidates)
-
-
 def group_packages(records):
     groups = groupby(lambda r: r.name.normalized, records)
     return {
