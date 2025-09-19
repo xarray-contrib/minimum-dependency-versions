@@ -47,3 +47,17 @@ def parse_environment(text):
         warnings.append(warnings_)
 
     return specs, warnings
+
+
+def compare_versions(environments, policy_versions, ignored_violations):
+    status = {}
+    for env, specs in environments.items():
+        env_status = any(
+            (
+                spec.name not in ignored_violations
+                and spec.version > policy_versions[spec.name].version
+            )
+            for spec in specs
+        )
+        status[env] = env_status
+    return status
