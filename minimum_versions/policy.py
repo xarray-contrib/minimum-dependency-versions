@@ -114,3 +114,10 @@ def parse_policy(f):
         ignored_violations=package_policy["ignored_violations"],
         overrides=package_policy["overrides"],
     )
+
+
+def find_policy_versions(policy, today, releases):
+    return {
+        name: policy.minimum_version(today, name, package_releases)
+        for name, package_releases in releases.items()
+    }

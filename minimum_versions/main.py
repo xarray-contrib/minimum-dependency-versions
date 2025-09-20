@@ -62,7 +62,7 @@ def validate(today, policy_file, environment_paths):
     if today is None:
         today = datetime.date.today()
 
-    policy_versions = find_policy_versions(package_releases, policy, today)
+    policy_versions = find_policy_versions(policy, today, package_releases)
 
     status = compare_versions(environments, policy_versions, policy.ignored_violations)
 
