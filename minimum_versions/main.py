@@ -6,7 +6,7 @@ import rich_click as click
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from tlz.itertools import concat
+from tlz.itertoolz import concat
 
 from minimum_versions.formatting import format_bump_table
 from minimum_versions.policy import find_policy_versions, parse_policy
