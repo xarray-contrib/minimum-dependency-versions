@@ -31,7 +31,7 @@ schema = {
                 "packages": {
                     "type": "object",
                     "patternProperties": {
-                        "^[a-z][-a-z_]*$": {"type": "integer", "minimum": 1}
+                        "^[a-z][a-z0-9_-]*$": {"type": "integer", "minimum": 1}
                     },
                     "additionalProperties": False,
                 },
@@ -39,14 +39,14 @@ schema = {
                 "overrides": {
                     "type": "object",
                     "patternProperties": {
-                        "^[a-z][-a-z_]*": {"type": "string", "format": "date"}
+                        "^[a-z][a-z0-9_-]*": {"type": "string", "format": "date"}
                     },
                     "additionalProperties": False,
                 },
                 "exclude": {"type": "array", "items": {"type": "string"}},
                 "ignored_violations": {
                     "type": "array",
-                    "items": {"type": "string", "pattern": "^[a-z][-a-z_]*$"},
+                    "items": {"type": "string", "pattern": r"^[a-z][a-z0-9_-]*$"},
                 },
             },
             "required": [
