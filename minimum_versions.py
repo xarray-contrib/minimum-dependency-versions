@@ -153,6 +153,22 @@ def parse_environment(text):
     return specs, warnings
 
 
+def assert_spec_has_version(environments):
+    # packages in policy.exclude were already removed
+
+    for env, specs in environments.items():
+        for spec in specs:
+            if spec.version is None:
+
+                msg = (
+                    f"No minimum version found for '{spec.name}' in '{env}'. Either"
+                    " add a version or add to the list of excluded packages in the"
+                    " policy file."
+                )
+
+                raise ValueError(msg)
+
+
 def parse_policy(file):
     policy = yaml.safe_load(file)
     try:
@@ -344,6 +360,10 @@ def parse_date(string):
 @click.option("--today", type=parse_date, default=None)
 @click.option("--policy", "policy_file", type=click.File(mode="r"), required=True)
 def main(today, policy_file, environment_paths):
+    _main(today, policy_file, environment_paths)
+
+
+def _main(today, policy_file, environment_paths):
     console = Console()
 
     policy = parse_policy(policy_file)
@@ -359,6 +379,8 @@ def main(today, policy_file, environment_paths):
         env: [spec for spec in specs if spec.name not in policy.exclude]
         for env, (specs, _) in parsed_environments.items()
     }
+
+    assert_spec_has_version(environments)
 
     all_packages = list(
         dict.fromkeys(spec.name for spec in concat(environments.values()))
