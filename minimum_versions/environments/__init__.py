@@ -1,10 +1,12 @@
 import pathlib
 
 from minimum_versions.environments.conda import parse_conda_environment
+from minimum_versions.environments.pixi import parse_pixi_environment
 from minimum_versions.environments.spec import Spec, compare_versions  # noqa: F401
 
 kinds = {
     "conda": parse_conda_environment,
+    "pixi": parse_pixi_environment,
 }
 
 
