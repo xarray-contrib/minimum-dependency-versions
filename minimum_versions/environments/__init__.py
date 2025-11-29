@@ -7,7 +7,12 @@ kinds = {
 
 
 def parse_environment(specifier: str) -> list[Spec]:
-    kind, path = specifier.split(":", maxsplit=1)
+    split = specifier.split(":", maxsplit=1)
+    if len(split) == 1:
+        kind = "conda"
+        path = specifier
+    else:
+        kind, path = split
 
     parser = kinds.get(kind)
     if parser is None:
