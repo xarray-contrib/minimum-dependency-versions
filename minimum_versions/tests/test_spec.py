@@ -1,7 +1,7 @@
 import pytest
 from rattler import Version
 
-from minimum_versions.spec import Spec
+from minimum_versions.environments import Spec, conda
 
 
 @pytest.mark.parametrize(
@@ -17,8 +17,8 @@ from minimum_versions.spec import Spec
         ),
     ),
 )
-def test_spec_parse(text, expected_spec, expected_name, expected_warnings):
-    actual_spec, (actual_name, actual_warnings) = Spec.parse(text)
+def test_parse_conda_spec(text, expected_spec, expected_name, expected_warnings):
+    actual_spec, (actual_name, actual_warnings) = conda.parse_spec(text)
 
     assert actual_spec == expected_spec
     assert actual_name == expected_name
