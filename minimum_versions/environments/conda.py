@@ -1,3 +1,5 @@
+import pathlib
+
 import yaml
 from rattler import Version
 
@@ -29,8 +31,8 @@ def parse_spec(spec_text):
     return Spec(name, version), (name, warnings)
 
 
-def parse_conda_environment(data):
-    env = yaml.safe_load(data)
+def parse_conda_environment(path: pathlib.Path, manifest_path: None):
+    env = yaml.safe_load(pathlib.Path(path).read_text())
 
     specs = []
     warnings = []

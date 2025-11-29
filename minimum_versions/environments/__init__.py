@@ -1,4 +1,6 @@
-from minimum_versions.environments.conda import parse_conda_environment  # noqa: F401
+import pathlib
+
+from minimum_versions.environments.conda import parse_conda_environment
 from minimum_versions.environments.spec import Spec, compare_versions  # noqa: F401
 
 kinds = {
@@ -6,7 +8,7 @@ kinds = {
 }
 
 
-def parse_environment(specifier: str) -> list[Spec]:
+def parse_environment(specifier: str, manifest_path: pathlib.Path | None) -> list[Spec]:
     split = specifier.split(":", maxsplit=1)
     if len(split) == 1:
         kind = "conda"
@@ -18,4 +20,4 @@ def parse_environment(specifier: str) -> list[Spec]:
     if parser is None:
         raise ValueError(f"Unknown kind {kind!r}, extracted from {specifier!r}.")
 
-    return parser(path)
+    return parser(path, manifest_path)

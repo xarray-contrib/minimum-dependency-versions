@@ -1,5 +1,6 @@
 import datetime
 import os.path
+import pathlib
 import sys
 
 import rich_click as click
@@ -30,15 +31,21 @@ def main():
 
 @main.command()
 @click.argument("environment_paths", type=str, nargs=-1)
+@click.option(
+    "--manifest-path",
+    "manifest_path",
+    type=click.Path(exists=True, path_type=pathlib.Path),
+    default=None,
+)
 @click.option("--today", type=parse_date, default=None)
 @click.option("--policy", "policy_file", type=click.File(mode="r"), required=True)
-def validate(today, policy_file, environment_paths):
+def validate(today, policy_file, manifest_path, environment_paths):
     console = Console()
 
     policy = parse_policy(policy_file)
 
     parsed_environments = {
-        path.rsplit(os.path.sep, maxsplit=1)[-1]: parse_environment(path)
+        path.rsplit(os.path.sep, maxsplit=1)[-1]: parse_environment(path, manifest_path)
         for path in environment_paths
     }
 
