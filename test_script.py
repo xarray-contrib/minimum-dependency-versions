@@ -3,7 +3,9 @@ import datetime as dt
 import pytest
 from rattler import Version
 
-from minimum_versions import Policy, Release, Spec
+from minimum_versions.policy import Policy
+from minimum_versions.release import Release
+from minimum_versions.spec import Spec
 
 
 @pytest.mark.parametrize(
