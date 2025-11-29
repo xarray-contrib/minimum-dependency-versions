@@ -20,9 +20,9 @@ jobs:
 
     steps:
       - name: clone the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "${{ matrix.python-version }}"
       - name: upgrade pip
@@ -50,24 +50,30 @@ jobs:
             envs/env1.yaml
             envs/env2.yaml
         expected-failure: ["false"]
+        policy-file: ["policy.yaml"]
         include:
           - env-paths: |
               envs/failing-env1.yaml
+            policy-file: "policy.yaml"
             expected-failure: "true"
           - env-paths: |
               envs/env1.yaml
               envs/failing-env1.yaml
+            policy-file: "policy.yaml"
             expected-failure: "true"
+          - env-paths: "envs/env1.yaml"
+            policy-file: policy_no_extra_options.yaml
+            expected-failure: "false"
 
     steps:
       - name: clone the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: run action
         uses: ./
         id: action-run
         continue-on-error: true
         with:
-          policy: policy.yaml
+          policy: ${{ matrix.policy-file }}
           environment-paths: ${{ matrix.env-paths }}
           today: 2024-12-20
       - name: detect outcome
