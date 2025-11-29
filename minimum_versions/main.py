@@ -1,5 +1,5 @@
 import datetime
-import pathlib
+import os.path
 import sys
 
 import rich_click as click
@@ -8,10 +8,10 @@ from rich.panel import Panel
 from rich.table import Table
 from tlz.itertoolz import concat
 
+from minimum_versions.environments import compare_versions, parse_environment
 from minimum_versions.formatting import format_bump_table
 from minimum_versions.policy import find_policy_versions, parse_policy
 from minimum_versions.release import fetch_releases
-from minimum_versions.spec import compare_versions, parse_environment
 
 click.rich_click.SHOW_ARGUMENTS = True
 
@@ -29,11 +29,7 @@ def main():
 
 
 @main.command()
-@click.argument(
-    "environment_paths",
-    type=click.Path(exists=True, readable=True, path_type=pathlib.Path),
-    nargs=-1,
-)
+@click.argument("environment_paths", type=str, nargs=-1)
 @click.option("--today", type=parse_date, default=None)
 @click.option("--policy", "policy_file", type=click.File(mode="r"), required=True)
 def validate(today, policy_file, environment_paths):
@@ -42,7 +38,8 @@ def validate(today, policy_file, environment_paths):
     policy = parse_policy(policy_file)
 
     parsed_environments = {
-        path.stem: parse_environment(path.read_text()) for path in environment_paths
+        path.rsplit(os.path.sep, maxsplit=1)[-1]: parse_environment(path)
+        for path in environment_paths
     }
 
     warnings = {
