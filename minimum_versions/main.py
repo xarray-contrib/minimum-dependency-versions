@@ -7,7 +7,7 @@ import rich_click as click
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from tlz.itertoolz import concat
+from tlz.itertoolz import concat, unique
 
 from minimum_versions.environments import compare_versions, parse_environment
 from minimum_versions.formatting import format_bump_table
@@ -58,7 +58,11 @@ def validate(today, policy_file, manifest_path, environment_paths):
     }
 
     all_packages = list(
-        dict.fromkeys(spec.name for spec in concat(environments.values()))
+        unique(
+            spec.name
+            for spec in concat(environments.values())
+            if spec.name not in policy.exclude
+        )
     )
 
     package_releases = fetch_releases(policy.channels, policy.platforms, all_packages)
