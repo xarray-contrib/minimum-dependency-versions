@@ -17,8 +17,12 @@ inputs:
       Time machine for testing
     required: false
     type: string
+  manifest-path: >-
+    description: >-
+      Path to the manifest file of `pixi`. Required for `pixi` environments.
+    required: false
+    type: string
 outputs: {}
-
 runs:
   using: "composite"
 
@@ -38,8 +42,10 @@ runs:
         POLICY_PATH: ${{ inputs.policy }}
         ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
         TODAY: ${{ inputs.today }}
+        MANIFEST_PATH: ${{ inputs.manifest-path }}
       run: |
         python -m minimum_versions validate \
           --today="$TODAY" \
           --policy="$POLICY_PATH" \
+          --manifest-path="$MANIFEST_PATH" \
           $ENVIRONMENT_PATHS

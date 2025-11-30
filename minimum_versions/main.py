@@ -2,6 +2,7 @@ import datetime
 import os.path
 import pathlib
 import sys
+from typing import Any
 
 import rich_click as click
 from rich.console import Console
@@ -24,6 +25,16 @@ def parse_date(string):
     return datetime.datetime.strptime(string, "%Y-%m-%d").date()
 
 
+class _Path(click.Path):
+    def convert(
+        self, value: Any, param: click.Parameter | None, ctx: click.Context | None
+    ) -> Any:
+        if not value:
+            return None
+
+        return super().convert(value, param, ctx)
+
+
 @click.group()
 def main():
     pass
@@ -34,7 +45,7 @@ def main():
 @click.option(
     "--manifest-path",
     "manifest_path",
-    type=click.Path(exists=True, path_type=pathlib.Path),
+    type=_Path(exists=True, path_type=pathlib.Path),
     default=None,
 )
 @click.option("--today", type=parse_date, default=None)
