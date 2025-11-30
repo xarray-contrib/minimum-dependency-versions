@@ -93,6 +93,16 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
 
     specs = []
     warnings = []
+
+    pypi_dependencies = {
+        feature: get_in([feature, "pypi-dependencies"], all_features, default=[])
+        for feature in env["features"]
+    }
+    with_pypi_dependencies = {
+        feature: bool(deps) for feature, deps in pypi_dependencies.items() if deps
+    }
+    for feature in with_pypi_dependencies:
+        warnings.append((f"feature:{feature}", ["Ignored PyPI dependencies."]))
     for name, pin in pins.items():
         spec, warnings_ = parse_spec(name, pin)
 
