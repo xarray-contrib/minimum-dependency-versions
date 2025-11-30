@@ -28,6 +28,7 @@ runs:
       run: |
         echo "::group::Install dependencies"
         python -m pip install -r ${{ github.action_path }}/requirements.txt
+        python -m pip install ${{ github.action_path }}
         echo "::endgroup::"
     - name: analyze environments
       shell: bash -l {0}
@@ -38,4 +39,7 @@ runs:
         ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
         TODAY: ${{ inputs.today }}
       run: |
-        PYTHONPATH=${{github.action_path}} python -m minimum_versions validate --today="$TODAY" --policy="$POLICY_PATH" $ENVIRONMENT_PATHS
+        python -m minimum_versions validate \
+          --today="$TODAY" \
+          --policy="$POLICY_PATH" \
+          $ENVIRONMENT_PATHS
