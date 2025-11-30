@@ -15,7 +15,10 @@ def compare_versions(environments, policy_versions, ignored_violations):
         env_status = any(
             (
                 spec.name not in ignored_violations
-                and spec.version > policy_versions[spec.name].version
+                and (
+                    spec.version is None
+                    or spec.version > policy_versions[spec.name].version
+                )
             )
             for spec in specs
         )
