@@ -47,7 +47,7 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
         ">": Style(color="#ff0000", bold=True),
         "=": Style(color="#008700", bold=True),
         "<": Style(color="#d78700", bold=True),
-        "!": Style(color="#ff0000", bold=True),
+        "!": warning_style,
     }
 
     for spec in specs:
