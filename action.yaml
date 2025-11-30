@@ -17,7 +17,7 @@ inputs:
       Time machine for testing
     required: false
     type: string
-  manifest-path: >-
+  manifest-path:
     description: >-
       Path to the manifest file of `pixi`. Required for `pixi` environments.
     required: false
