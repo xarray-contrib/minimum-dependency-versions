@@ -82,6 +82,8 @@ class Policy:
         suitable_releases = [
             release for release in releases if is_suitable_release(release)
         ]
+        if not suitable_releases:
+            raise ValueError(f"Cannot find valid releases for {package_name}")
 
         policy_months = self.package_months.get(package_name, self.default_months)
 
@@ -90,6 +92,7 @@ class Policy:
         index = bisect.bisect_left(
             suitable_releases, cutoff_date, key=lambda x: x.timestamp.date()
         )
+
         return suitable_releases[index - 1 if index > 0 else 0]
 
 
