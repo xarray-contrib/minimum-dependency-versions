@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env-paths:
+        envs:
           - "envs/env1.yaml"
           - "envs/env2.yaml"
           - |
@@ -53,16 +53,16 @@ jobs:
         expected-failure: ["false"]
         policy-file: ["policy.yaml"]
         include:
-          - env-paths: |
+          - envs: |
               envs/failing-env1.yaml
             policy-file: "policy.yaml"
             expected-failure: "true"
-          - env-paths: |
+          - envs: |
               envs/env1.yaml
               envs/failing-env1.yaml
             policy-file: "policy.yaml"
             expected-failure: "true"
-          - env-paths: "envs/env1.yaml"
+          - envs: "envs/env1.yaml"
             policy-file: policy_no_extra_options.yaml
             expected-failure: "false"
 
@@ -75,8 +75,9 @@ jobs:
         continue-on-error: true
         with:
           policy: ${{ matrix.policy-file }}
-          environment-paths: ${{ matrix.env-paths }}
+          environments: ${{ matrix.envs }}
           today: 2024-12-20
+          manifest-path: ${{ matrix.manifest-paths }}
       - name: detect outcome
         if: always()
         shell: bash -l {0}
