@@ -85,8 +85,15 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
     if env is None:
         raise ValueError(f"Unknown environment: {name}")
 
-    features = [
-        get_in([feature, "dependencies"], all_features) for feature in env["features"]
+    if isinstance(env, list):
+        feature_names = env
+    elif isinstance(env, dict) and list(env) != ["features"]:
+        raise ValueError("Options other than 'features' are not supported.")
+    else:
+        feature_names = env["features"]
+
+    features = [pixi_config.get("dependencies", [])] + [
+        get_in([feature, "dependencies"], all_features) for feature in feature_names
     ]
 
     pins = merge(features)
