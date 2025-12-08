@@ -1,0 +1,14 @@
+[dependencies]
+numpy = "1.24"
+pandas = "2.1"
+packaging = "23.1"
+
+[feature.py310.dependencies]
+python = "3.10"
+
+[feature.py311.dependencies]
+python = "3.11"
+
+[environments]
+env1 = { features = ["py310"] }
+env2 = ["py311"]

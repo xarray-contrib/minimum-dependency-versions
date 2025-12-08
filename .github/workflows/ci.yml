@@ -65,6 +65,16 @@ jobs:
           - envs: "envs/env1.yaml"
             policy-file: policy_no_extra_options.yaml
             expected-failure: "false"
+          - envs: pixi:env1
+            manifest-path: envs/pixi.toml
+          - envs: |
+              pixi:env1
+              pixi:env2
+            manifest-path: envs/pixi.toml
+          - envs: |
+              pixi:env1
+              conda:envs/env2.yaml
+            manifest-path: envs/pixi.toml
 
     steps:
       - name: clone the repository
