@@ -90,7 +90,7 @@ jobs:
           policy: ${{ matrix.policy-file }}
           environments: ${{ matrix.envs }}
           today: 2024-12-20
-          manifest-path: ${{ matrix.manifest-paths }}
+          manifest-path: ${{ matrix.manifest-path }}
       - name: detect outcome
         if: always()
         shell: bash -l {0}
