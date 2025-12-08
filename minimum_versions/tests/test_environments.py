@@ -1,3 +1,5 @@
+import pathlib
+import textwrap
 from dataclasses import dataclass
 
 import pytest
@@ -145,4 +147,41 @@ class TestParseCondaEnvironment:
 
         assert actual_spec == expected_spec
         assert actual_name == expected_spec.name
+        assert actual_warnings == expected_warnings
+
+    def test_parse_environment(self, monkeypatch):
+        data = textwrap.dedent(
+            """\
+            channels:
+            - conda-forge
+            dependencies:
+            - a=1.1
+            - b>=3.2
+            - c=1.6.5
+            """.rstrip()
+        )
+        monkeypatch.setattr(pathlib.Path, "read_text", lambda _: data)
+
+        expected_specs = [
+            Spec("a", Version("1.1")),
+            Spec("b", Version("3.2")),
+            Spec("c", Version("1.6.5")),
+        ]
+        expected_warnings = [
+            ("a", []),
+            (
+                "b",
+                [
+                    "package must be pinned with an exact version: 'b>=3.2'."
+                    " Using the version as an exact pin instead."
+                ],
+            ),
+            ("c", ["package should be pinned to a minor version (got 1.6.5)"]),
+        ]
+
+        actual_specs, actual_warnings = environments.conda.parse_conda_environment(
+            "env1.yaml", None
+        )
+
+        assert actual_specs == expected_specs
         assert actual_warnings == expected_warnings
