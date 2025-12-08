@@ -215,6 +215,14 @@ class TestPixiEnvironment:
                 ],
                 id="tight_pin",
             ),
+            pytest.param(
+                "d",
+                "1.9.1",
+                Spec("d", Version("1.9.1")),
+                ["package should be pinned to a minor version (got 1.9.1)"],
+                id="patch_pin",
+            ),
+            pytest.param("e", "*", Spec("e", None), [], id="unpinned"),
         ),
     )
     def test_parse_spec(self, name, version_text, expected_spec, expected_warnings):
