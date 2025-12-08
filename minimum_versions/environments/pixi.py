@@ -86,14 +86,19 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
         raise ValueError(f"Unknown environment: {name}")
 
     if isinstance(env, list):
-        feature_names = env
+        feature_names = ["default"] + env
     elif isinstance(env, dict) and list(env) != ["features"]:
         raise ValueError("Options other than 'features' are not supported.")
     else:
-        feature_names = env["features"]
+        feature_names = ["default"] + env["features"]
 
-    features = [pixi_config.get("dependencies", [])] + [
-        get_in([feature, "dependencies"], all_features) for feature in feature_names
+    features = [
+        (
+            get_in([feature, "dependencies"], all_features)
+            if feature != "default"
+            else pixi_config.get("dependencies", [])
+        )
+        for feature in feature_names
     ]
 
     pins = merge(features)
@@ -102,8 +107,12 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
     warnings = []
 
     pypi_dependencies = {
-        feature: get_in([feature, "pypi-dependencies"], all_features, default=[])
-        for feature in env["features"]
+        feature: (
+            get_in([feature, "pypi-dependencies"], all_features)
+            if feature != "default"
+            else pixi_config.get("pypi-dependencies", [])
+        )
+        for feature in feature_names
     }
     with_pypi_dependencies = {
         feature: bool(deps) for feature, deps in pypi_dependencies.items() if deps
