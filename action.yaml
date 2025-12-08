@@ -7,16 +7,18 @@ inputs:
       The path to the policy to follow
     required: true
     type: string
-  environment-paths:
-    description: >-
-      The paths to the environment files
-    required: true
-    type: list
   today:
     description: >-
       Time machine for testing
     required: false
     type: string
+  environments:
+    description: >-
+      The names or paths of the environments. Pixi environment names must be
+      prefixed with `pixi:`. Conda environment paths may be prefixed with
+      `conda:`. If there is no prefix, it is assumed to be a conda env path.
+    required: true
+    type: list
   manifest-path:
     description: >-
       Path to the manifest file of `pixi`. Required for `pixi` environments.
@@ -40,7 +42,7 @@ runs:
         COLUMNS: 120
         FORCE_COLOR: 3
         POLICY_PATH: ${{ inputs.policy }}
-        ENVIRONMENT_PATHS: ${{ inputs.environment-paths }}
+        ENVIRONMENTS: ${{ inputs.environment }}
         TODAY: ${{ inputs.today }}
         MANIFEST_PATH: ${{ inputs.manifest-path }}
       run: |
@@ -48,4 +50,4 @@ runs:
           --today="$TODAY" \
           --policy="$POLICY_PATH" \
           --manifest-path="$MANIFEST_PATH" \
-          $ENVIRONMENT_PATHS
+          $ENVIRONMENTS
