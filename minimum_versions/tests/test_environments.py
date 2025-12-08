@@ -84,7 +84,7 @@ def test_compare_versions(envs, ignored_violations, expected):
     assert actual == expected
 
 
-class TestParseCondaEnvironment:
+class TestCondaEnvironment:
     @pytest.mark.parametrize(
         ["spec_text", "expected_spec", "expected_warnings"],
         (
