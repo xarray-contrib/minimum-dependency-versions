@@ -42,7 +42,7 @@ runs:
         COLUMNS: 120
         FORCE_COLOR: 3
         POLICY_PATH: ${{ inputs.policy }}
-        ENVIRONMENTS: ${{ inputs.environment }}
+        ENVIRONMENTS: ${{ inputs.environments }}
         TODAY: ${{ inputs.today }}
         MANIFEST_PATH: ${{ inputs.manifest-path }}
       run: |
