@@ -63,21 +63,24 @@ jobs:
             policy-file: "policy.yaml"
             expected-failure: "true"
           - envs: "envs/env1.yaml"
-            policy-file: policy_no_extra_options.yaml
+            policy-file: "policy_no_extra_options.yaml"
             expected-failure: "false"
-          - envs: pixi:env1
-            manifest-path: envs/pixi.toml
+          - envs: "pixi:env1"
+            manifest-path: "envs/pixi.toml"
             policy-file: "policy.yaml"
+            expected-failure: "false"
           - envs: |
               pixi:env1
               pixi:env2
-            manifest-path: envs/pixi.toml
+            manifest-path: "envs/pixi.toml"
             policy-file: "policy.yaml"
+            expected-failure: "false"
           - envs: |
               pixi:env1
               conda:envs/env2.yaml
-            manifest-path: envs/pixi.toml
+            manifest-path: "envs/pixi.toml"
             policy-file: "policy.yaml"
+            expected-failure: "false"
 
     steps:
       - name: clone the repository
