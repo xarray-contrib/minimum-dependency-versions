@@ -80,3 +80,69 @@ def test_compare_versions(envs, ignored_violations, expected):
         envs, policy_versions, ignored_violations
     )
     assert actual == expected
+
+
+class TestParseCondaEnvironment:
+    @pytest.mark.parametrize(
+        ["spec_text", "expected_spec", "expected_warnings"],
+        (
+            pytest.param(
+                "a=3.2", Spec("a", Version("3.2")), [], id="exact-no_warnings"
+            ),
+            pytest.param(
+                "b>=1.1",
+                Spec("b", Version("1.1")),
+                [
+                    "package must be pinned with an exact version: 'b>=1.1'."
+                    " Using the version as an exact pin instead."
+                ],
+                id="lower_bound",
+            ),
+            pytest.param(
+                "b<=4.1",
+                Spec("b", Version("4.1")),
+                [
+                    "package must be pinned with an exact version: 'b<=4.1'."
+                    " Using the version as an exact pin instead."
+                ],
+                id="upper_equal_bound",
+            ),
+            pytest.param(
+                "b<4.1",
+                Spec("b", Version("4.1")),
+                [
+                    "package must be pinned with an exact version: 'b<=4.1'."
+                    " Using the version as an exact pin instead."
+                ],
+                marks=pytest.mark.xfail(
+                    reason="exclusive upper bounds are not supported"
+                ),
+                id="upper_bound",
+            ),
+            pytest.param(
+                "b>4.1",
+                Spec("b", Version("4.1")),
+                [
+                    "package must be pinned with an exact version: 'b>4.1'."
+                    " Using the version as an exact pin instead."
+                ],
+                marks=pytest.mark.xfail(
+                    reason="exclusive lower bounds are not supported"
+                ),
+                id="lower_bound",
+            ),
+            pytest.param(
+                "c=1.6.2",
+                Spec("c", Version("1.6.2")),
+                ["package should be pinned to a minor version (got 1.6.2)"],
+            ),
+        ),
+    )
+    def test_parse_spec(self, spec_text, expected_spec, expected_warnings):
+        actual_spec, (actual_name, actual_warnings) = environments.conda.parse_spec(
+            spec_text
+        )
+
+        assert actual_spec == expected_spec
+        assert actual_name == expected_spec.name
+        assert actual_warnings == expected_warnings
