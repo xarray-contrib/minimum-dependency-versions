@@ -81,6 +81,10 @@ jobs:
             manifest-path: "envs/pixi.toml"
             policy-file: "policy.yaml"
             expected-failure: "false"
+          - envs: "pixi:failing-env"
+            manifest-path: "envs/pixi.toml"
+            policy-file: "policy.yaml"
+            expected-failure: "true"
 
     steps:
       - name: clone the repository
