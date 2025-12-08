@@ -42,7 +42,11 @@ them to an empty mapping or sequence, respectively:
   ignored_violations: []
 ```
 
-Then add a new step to CI:
+Then add a new step to CI.
+
+### conda
+
+To analyze conda environments, simply pass the path to the environment file (`env.yaml`) to the `environments` key.
 
 ```yaml
 jobs:
@@ -53,7 +57,7 @@ jobs:
     - uses: xarray-contrib/minimum-dependency-versions@version
       with:
         policy: policy.yaml
-        environment-paths: path/to/env.yaml
+        environments: path/to/env.yaml
 ```
 
 To analyze multiple environments at the same time, pass a multi-line string:
@@ -67,8 +71,61 @@ jobs:
 
     - uses: xarray-contrib/minimum-dependency-versions@version
       with:
-        environment-paths: |
+        environments: |
           path/to/env1.yaml
           path/to/env2.yaml
-          path/to/env3.yaml
+          conda:path/to/env3.yaml  # the conda: prefix is optional
+```
+
+### pixi
+
+To analyze pixi environments, specify the environment name prefixed with `pixi:` and point to the manifest file using `manifest-path`:
+
+```yaml
+jobs:
+  my-job:
+    ...
+    steps:
+    ...
+
+    - uses: xarray-contrib/minimum-dependency-versions@version
+      with:
+        environments: pixi:env1
+        manifest-path: /path/to/pixi.toml  # or pyproject.toml
+```
+
+Multiple environments can be analyzed at the same time:
+
+```yaml
+jobs:
+  my-job:
+    ...
+    steps:
+    ...
+
+    - uses: xarray-contrib/minimum-dependency-versions@version
+      with:
+        environments: |
+          pixi:env1
+          pixi:env2
+        manifest-path: /path/to/pixi.toml  # or pyproject.toml
+```
+
+### Mixing environment types
+
+It is even possible to mix environment types (once again, the `conda:` prefix is optional but recommended):
+
+```yaml
+jobs:
+  my-job:
+    ...
+    steps:
+    ...
+
+    - uses: xarray-contrib/minimum-dependency-versions@version
+      with:
+        environments: |
+          pixi:env1
+          conda:path/to/env.yaml
+        manifest-path: path/to/pixi.toml  # or pyproject.toml
 ```
