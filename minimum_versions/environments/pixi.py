@@ -7,7 +7,7 @@ from tlz.dicttoolz import get_in, merge
 
 from minimum_versions.environments.spec import Spec
 
-_version_re = r"[0-9]+\.[0-9]+(?:\.[0-9]+|\.\*)"
+_version_re = r"[0-9]+\.[0-9]+(?:\.[0-9]+|\.\*)?"
 version_re = re.compile(f"(?P<version>{_version_re})")
 lower_pin_re = re.compile(rf">=(?P<version>{_version_re})$")
 tight_pin_re = re.compile(rf">=(?P<lower>{_version_re}),<(?P<upper>{_version_re})")
