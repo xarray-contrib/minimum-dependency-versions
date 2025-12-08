@@ -185,3 +185,43 @@ class TestCondaEnvironment:
 
         assert actual_specs == expected_specs
         assert actual_warnings == expected_warnings
+
+
+class TestPixiEnvironment:
+    @pytest.mark.parametrize(
+        ["name", "version_text", "expected_spec", "expected_warnings"],
+        (
+            pytest.param(
+                "a", "1.2.*", Spec("a", Version("1.2")), [], id="star_pin–no_warnings"
+            ),
+            pytest.param(
+                "b",
+                ">=3.1",
+                Spec("b", Version("3.1")),
+                [
+                    "package must be pinned with an exact version: '>=3.1'."
+                    " Using the version as an exact pin instead."
+                ],
+                id="lower_pin",
+            ),
+            pytest.param(
+                "c",
+                ">=1.6.0,<1.7.0",
+                Spec("c", Version("1.6")),
+                [
+                    "lower pin '1.6.0' and upper pin '1.7.0' found."
+                    " Using the lower pin for now, please convert to"
+                    " the standard x.y.* syntax."
+                ],
+                id="tight_pin",
+            ),
+        ),
+    )
+    def test_parse_spec(self, name, version_text, expected_spec, expected_warnings):
+        actual_spec, (actual_name, actual_warnings) = environments.pixi.parse_spec(
+            name, version_text
+        )
+
+        assert actual_spec == expected_spec
+        assert actual_name == name
+        assert actual_warnings == expected_warnings
