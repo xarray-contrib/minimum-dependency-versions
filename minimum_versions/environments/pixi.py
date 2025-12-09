@@ -77,9 +77,7 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
     if environment_definitions is None:
         raise ValueError("Can't find environments in the pixi config.")
 
-    all_features = pixi_config.get("feature")
-    if all_features is None:
-        raise ValueError("No features found in the pixi config.")
+    all_features = pixi_config.get("feature", {})
 
     env = environment_definitions.get(name)
     if env is None:

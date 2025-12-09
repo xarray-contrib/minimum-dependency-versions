@@ -283,6 +283,20 @@ class TestPixiEnvironment:
                 [("c", [])],
                 id="no-default-feature",
             ),
+            pytest.param(
+                textwrap.dedent(
+                    """\
+                    [dependencies]
+                    a = "1.0.*"
+
+                    [environments]
+                    env1 = { features = [] }
+                    """.rstrip()
+                ),
+                [Spec("a", Version("1.0"))],
+                [("a", [])],
+                id="missing-features",
+            ),
         ),
     )
     def test_parse_pixi_environment(
