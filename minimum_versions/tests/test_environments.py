@@ -355,6 +355,9 @@ class TestPixiEnvironment:
             pytest.param(
                 textwrap.dedent(
                     """\
+                    [package]
+                    name = "a"
+
                     [dependencies]
                     a = { path = "." }
 
