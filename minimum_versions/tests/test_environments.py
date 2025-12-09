@@ -240,20 +240,54 @@ class TestPixiEnvironment:
         with pytest.raises(ValueError, match="Unknown version format: .*"):
             environments.pixi.parse_spec("package", version_text)
 
-    def test_parse_pixi_environment(self, monkeypatch):
-        data = textwrap.dedent(
-            """\
-            [dependencies]
-            a = "1.0.*"
-            b = "2.2.*"
+    @pytest.mark.parametrize(
+        ["data", "expected_specs", "expected_warnings"],
+        (
+            pytest.param(
+                textwrap.dedent(
+                    """\
+                    [dependencies]
+                    a = "1.0.*"
+                    b = "2.2.*"
 
-            [feature.feature1.dependencies]
-            c = "3.1.*"
+                    [feature.feature1.dependencies]
+                    c = "3.1.*"
 
-            [environments]
-            env1 = { features = ["feature1"] }
-            """.rstrip()
-        )
+                    [environments]
+                    env1 = { features = ["feature1"] }
+                    """.rstrip()
+                ),
+                [
+                    Spec("a", Version("1.0")),
+                    Spec("b", Version("2.2")),
+                    Spec("c", Version("3.1")),
+                ],
+                [("a", []), ("b", []), ("c", [])],
+                id="default-feature",
+            ),
+            pytest.param(
+                textwrap.dedent(
+                    """\
+                    [dependencies]
+                    a = "1.0.*"
+                    b = "2.2.*"
+
+                    [feature.feature1.dependencies]
+                    c = "3.1.*"
+
+                    [environments]
+                    env1 = { features = ["feature1"], no-default-feature = true }
+                    """.rstrip()
+                ),
+                [Spec("c", Version("3.1"))],
+                [("c", [])],
+                id="no-default-feature",
+            ),
+        ),
+    )
+    def test_parse_pixi_environment(
+        self, monkeypatch, data, expected_specs, expected_warnings
+    ):
         monkeypatch.setattr(
             pathlib.Path, "open", lambda _, mode: io.BytesIO(data.encode())
         )
@@ -264,11 +298,5 @@ class TestPixiEnvironment:
         actual_specs, actual_warnings = environments.pixi.parse_pixi_environment(
             name, manifest_path
         )
-        expected_specs = [
-            Spec("a", Version("1.0")),
-            Spec("b", Version("2.2")),
-            Spec("c", Version("3.1")),
-        ]
-        expected_warnings = [("a", []), ("b", []), ("c", [])]
         assert actual_specs == expected_specs
         assert actual_warnings == expected_warnings

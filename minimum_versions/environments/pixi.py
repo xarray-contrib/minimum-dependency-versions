@@ -86,11 +86,18 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
         raise ValueError(f"Unknown environment: {name}")
 
     if isinstance(env, list):
-        feature_names = ["default"] + env
-    elif isinstance(env, dict) and list(env) != ["features"]:
-        raise ValueError("Options other than 'features' are not supported.")
+        feature_names = env
+    elif isinstance(env, dict) and env.keys() - {"features", "no-default-feature"}:
+        raise ValueError(
+            "Options other than 'features' and 'no-default-feature'"
+            f" are not supported. Got {env}."
+        )
+    elif isinstance(env, dict):
+        feature_names = env["features"]
+        if not env.get("no-default-feature", False):
+            feature_names.insert(0, "default")
     else:
-        feature_names = ["default"] + env["features"]
+        raise ValueError("unexpected environment type")
 
     features = [
         (
