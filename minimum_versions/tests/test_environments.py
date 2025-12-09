@@ -303,6 +303,42 @@ class TestPixiEnvironment:
             pytest.param(
                 textwrap.dedent(
                     """\
+                    [dependencies]
+                    a = "1.0.*"
+
+                    [pypi-dependencies]
+                    b = "3.2.*"
+
+                    [environments]
+                    env1 = { features = [] }
+                    """.rstrip()
+                ),
+                "pixi.toml",
+                [Spec("a", Version("1.0"))],
+                [("feature:default", ["Ignored PyPI dependencies."]), ("a", [])],
+                id="pypi_dependencies-default",
+            ),
+            pytest.param(
+                textwrap.dedent(
+                    """\
+                    [dependencies]
+                    a = "1.0.*"
+
+                    [feature.feat1.pypi-dependencies]
+                    b = "3.2.*"
+
+                    [environments]
+                    env1 = { features = ["feat1"] }
+                    """.rstrip()
+                ),
+                "pixi.toml",
+                [Spec("a", Version("1.0"))],
+                [("feature:feat1", ["Ignored PyPI dependencies."]), ("a", [])],
+                id="pypi_dependencies-feat1",
+            ),
+            pytest.param(
+                textwrap.dedent(
+                    """\
                     [tool.pixi.feature.feature1.dependencies]
                     c = "3.1.*"
 
