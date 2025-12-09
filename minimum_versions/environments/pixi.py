@@ -115,7 +115,13 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
         for feature in feature_names
     ]
 
-    pins = merge(features)
+    local_package_name = get_in(["package", "name"], pixi_config, None)
+    pins = {
+        name: pin
+        for name, pin in merge(features).items()
+        # skip the local package, if any
+        if name != local_package_name
+    }
 
     specs = []
     warnings = []
