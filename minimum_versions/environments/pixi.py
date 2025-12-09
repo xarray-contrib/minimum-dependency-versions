@@ -13,11 +13,14 @@ lower_pin_re = re.compile(rf">=(?P<version>{_version_re})$")
 tight_pin_re = re.compile(rf">=(?P<lower>{_version_re}),<(?P<upper>{_version_re})")
 
 
-def parse_spec(name, version_text):
+def parse_spec(name, version_text: str | dict):
     # "*" => None
     # "x.y.*" => "x.y"
     # ">=x.y.0,<x.(y + 1).0" => "x.y" (+ warning)
     # ">=x.y.*" => "x.y" (+ warning)
+
+    if isinstance(version_text, dict):
+        version_text = version_text.get("version", "*")
 
     warnings = []
     if version_text == "*":
