@@ -100,6 +100,12 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
     else:
         raise ValueError("unexpected environment type")
 
+    unknown_features = [
+        name for name in feature_names if name != "default" and name not in all_features
+    ]
+    if unknown_features:
+        raise ValueError(f"unknown features: {', '.join(unknown_features)}")
+
     features = [
         (
             get_in([feature, "dependencies"], all_features)
