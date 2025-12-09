@@ -235,7 +235,7 @@ class TestPixiEnvironment:
         assert actual_name == name
         assert actual_warnings == expected_warnings
 
-    @pytest.mark.parametrize("version_text", ("~1.3", "^2.1", "<1.1"))
+    @pytest.mark.parametrize("version_text", ("~1.3", "^2.1", "<1.1", "<=2025.01"))
     def test_parse_spec_error(self, version_text):
         with pytest.raises(ValueError, match="Unsupported version spec: .*"):
             environments.pixi.parse_spec("package", version_text)
