@@ -224,6 +224,7 @@ class TestPixiEnvironment:
                 id="patch_pin",
             ),
             pytest.param("e", "*", Spec("e", None), [], id="unpinned"),
+            pytest.param("f", {"path": "."}, Spec("f", None), [], id="source_package"),
         ),
     )
     def test_parse_spec(self, name, version_text, expected_spec, expected_warnings):
@@ -350,6 +351,24 @@ class TestPixiEnvironment:
                 [Spec("c", Version("3.1"))],
                 [("c", [])],
                 id="pyproject",
+            ),
+            pytest.param(
+                textwrap.dedent(
+                    """\
+                    [dependencies]
+                    a = { path = "." }
+
+                    [feature.feature1.dependencies]
+                    c = "3.1.*"
+
+                    [environments]
+                    env1 = { features = ["feature1"] }
+                    """.rstrip()
+                ),
+                "pixi.toml",
+                [Spec("c", Version("3.1"))],
+                [("c", [])],
+                id="local_package",
             ),
         ),
     )
