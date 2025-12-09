@@ -237,7 +237,7 @@ class TestPixiEnvironment:
 
     @pytest.mark.parametrize("version_text", ("~1.3", "^2.1", "<1.1"))
     def test_parse_spec_error(self, version_text):
-        with pytest.raises(ValueError, match="Unknown version format: .*"):
+        with pytest.raises(ValueError, match="Unsupported version spec: .*"):
             environments.pixi.parse_spec("package", version_text)
 
     @pytest.mark.parametrize(

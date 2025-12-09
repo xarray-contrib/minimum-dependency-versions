@@ -42,7 +42,7 @@ def parse_spec(name, version_text):
 
         raw_version = lower_pin
     else:
-        raise ValueError(f"Unknown version format: {version_text}")
+        raise ValueError(f"Unsupported version spec: {version_text}")
 
     if raw_version is not None:
         version = Version(raw_version.removesuffix(".*"))
