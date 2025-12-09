@@ -67,14 +67,14 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
     with manifest_path.open(mode="rb") as f:
         data = tomllib.load(f)
 
-    if manifest_path.name == "pixi.toml":
-        pixi_config = data
-    else:
-        pixi_config = get_in(["pixi", "tool"], data, None)
+    if manifest_path.name == "pyproject.toml":
+        pixi_config = get_in(["tool", "pixi"], data, None)
         if pixi_config is None:
             raise ValueError(
                 f"The 'tool.pixi' section is missing from {manifest_path}."
             )
+    else:
+        pixi_config = data
 
     environment_definitions = pixi_config.get("environments")
     if environment_definitions is None:

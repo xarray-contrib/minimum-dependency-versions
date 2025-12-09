@@ -241,7 +241,7 @@ class TestPixiEnvironment:
             environments.pixi.parse_spec("package", version_text)
 
     @pytest.mark.parametrize(
-        ["data", "expected_specs", "expected_warnings"],
+        ["data", "path", "expected_specs", "expected_warnings"],
         (
             pytest.param(
                 textwrap.dedent(
@@ -257,6 +257,7 @@ class TestPixiEnvironment:
                     env1 = { features = ["feature1"] }
                     """.rstrip()
                 ),
+                "pixi.toml",
                 [
                     Spec("a", Version("1.0")),
                     Spec("b", Version("2.2")),
@@ -279,6 +280,7 @@ class TestPixiEnvironment:
                     env1 = { features = ["feature1"], no-default-feature = true }
                     """.rstrip()
                 ),
+                "pixi.toml",
                 [Spec("c", Version("3.1"))],
                 [("c", [])],
                 id="no-default-feature",
@@ -293,21 +295,37 @@ class TestPixiEnvironment:
                     env1 = { features = [] }
                     """.rstrip()
                 ),
+                "pixi.toml",
                 [Spec("a", Version("1.0"))],
                 [("a", [])],
                 id="missing-features",
             ),
+            pytest.param(
+                textwrap.dedent(
+                    """\
+                    [tool.pixi.feature.feature1.dependencies]
+                    c = "3.1.*"
+
+                    [tool.pixi.environments]
+                    env1 = { features = ["feature1"], no-default-feature = true }
+                    """.rstrip()
+                ),
+                "pyproject.toml",
+                [Spec("c", Version("3.1"))],
+                [("c", [])],
+                id="pyproject",
+            ),
         ),
     )
     def test_parse_pixi_environment(
-        self, monkeypatch, data, expected_specs, expected_warnings
+        self, monkeypatch, path, data, expected_specs, expected_warnings
     ):
         monkeypatch.setattr(
             pathlib.Path, "open", lambda _, mode: io.BytesIO(data.encode())
         )
 
         name = "env1"
-        manifest_path = pathlib.Path("pixi.toml")
+        manifest_path = pathlib.Path(path)
 
         actual_specs, actual_warnings = environments.pixi.parse_pixi_environment(
             name, manifest_path
