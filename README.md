@@ -48,6 +48,8 @@ Then add a new step to CI.
 
 To analyze conda environments, simply pass the path to the environment file (`env.yaml`) to the `environments` key.
 
+The conda environment file _must_ specify exactly the `conda-forge` channel.
+
 ```yaml
 jobs:
   my-job:
@@ -79,7 +81,9 @@ jobs:
 
 ### pixi
 
-To analyze pixi environments, specify the environment name prefixed with `pixi:` and point to the manifest file using `manifest-path`:
+To analyze pixi environments, specify the environment name prefixed with `pixi:` and point to the manifest file using `manifest-path`.
+
+Any environment must pin the dependencies, which must be exact pins (i.e. `x.y.*` or `>=x.y.0,<x.(y + 1).0`, with the former being strongly encouraged). Lower pins are interpreted as exact pins, while all other forms of pinning are not allowed.
 
 ```yaml
 jobs:
