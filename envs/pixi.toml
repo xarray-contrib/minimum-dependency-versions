@@ -1,0 +1,17 @@
+[dependencies]
+pandas = "2.1"
+packaging = "23.1"
+
+[feature.py39.dependencies]
+python = "3.9"
+
+[feature.py310.dependencies]
+python = "3.10"
+
+[feature.failing.dependencies]
+numpy = "2.1"
+
+[environments]
+env1 = { features = ["py310"] }
+env2 = ["py39"]
+failing-env = { features = ["failing"] }
