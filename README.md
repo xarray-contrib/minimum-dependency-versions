@@ -133,3 +133,15 @@ jobs:
           conda:path/to/env.yaml
         manifest-path: path/to/pixi.toml  # or pyproject.toml
 ```
+
+### Running locally
+
+You can also easily run the checker locally using UV. See the example below which usese `v1.0.0` (remove the `@v1.0.0` to use the version in `main`):
+
+```bash
+uv run --with 'minimum-dependency-versions @ git+https://github.com/xarray-contrib/minimum-dependency-versions@v1.0.0'\
+          python -m minimum_versions validate\
+          --policy=.github/ci/policy.yaml\
+          --manifest-path=pixi.toml\
+          pixi:test-minimum
+```
