@@ -17,6 +17,9 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.scripts]
+minimum-versions = "minimum_versions.main:main"
+
 [project.urls]
 Repository = "https://github.com/xarray-contrib/minimum-dependency-versions"
 
