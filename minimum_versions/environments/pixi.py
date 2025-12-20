@@ -1,7 +1,7 @@
 import pathlib
 import re
-
 import tomllib
+
 from rattler import Version
 from tlz.dicttoolz import get_in, merge
 
