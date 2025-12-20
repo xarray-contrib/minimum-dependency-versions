@@ -25,18 +25,10 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: setup python
-        uses: actions/setup-python@v6
+      - name: setup environment
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # 7.1.6
         with:
           python-version: "${{ matrix.python-version }}"
-      - name: upgrade pip
-        run: |
-          python -m pip install --upgrade pip
-      - name: install dependencies
-        run: |
-          python -m pip install -r requirements.txt
-          python -m pip install .
-          python -m pip install pytest
       - name: run tests
         run: |
-          python -m pytest -rf
+          uv run -m pytest -rf --cov=minimum_versions
