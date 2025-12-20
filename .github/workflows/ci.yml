@@ -9,6 +9,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   ci:
     name: tests
@@ -21,6 +23,8 @@ jobs:
     steps:
       - name: clone the repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: setup python
         uses: actions/setup-python@v6
         with:
@@ -89,6 +93,8 @@ jobs:
     steps:
       - name: clone the repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: run action
         uses: ./
         id: action-run
@@ -101,20 +107,22 @@ jobs:
       - name: detect outcome
         if: always()
         shell: bash -l {0}
+        env:
+          OUTCOME: "${{ steps.action-run.outcome }}"
         run: |
-          if [[ "${{ steps.action-run.outcome }}" == "success" && ${{ matrix.expected-failure }} == "true" ]]; then
+          if [[ "$OUTCOME" == "success" && ${{ matrix.expected-failure }} == "true" ]]; then
               # unexpected pass
               echo "workflow xpassed"
               export STATUS=1
-          elif [[ "${{ steps.action-run.outcome }}" == "failure" && ${{ matrix.expected-failure }} == "false" ]]; then
+          elif [[ "$OUTCOME" == "failure" && ${{ matrix.expected-failure }} == "false" ]]; then
               # unexpected failure
               echo "workflow failed"
               export STATUS=2
-          elif [[ "${{ steps.action-run.outcome }}" == "success" && ${{ matrix.expected-failure }} == "false" ]]; then
+          elif [[ "$OUTCOME" == "success" && ${{ matrix.expected-failure }} == "false" ]]; then
               # normal pass
               echo "workflow passed"
               export STATUS=0
-          elif [[ "${{ steps.action-run.outcome }}" == "failure" && ${{ matrix.expected-failure }} == "true" ]]; then
+          elif [[ "$OUTCOME" == "failure" && ${{ matrix.expected-failure }} == "true" ]]; then
               # expected failure
               echo "workflow xfailed"
               export STATUS=0
