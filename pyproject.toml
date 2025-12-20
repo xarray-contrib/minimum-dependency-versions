@@ -1,21 +1,25 @@
 [project]
-name = "minimum-dependency-versions"
+name = "xarray-minimum-dependency-policy"
 authors = [
   { name = "Justus Magin" },
 ]
+readme = "README.md"
 license = "Apache-2.0"
 description = "Validate minimum dependency environments according to xarray's policy scheme"
 requires-python = ">=3.11"
 dependencies = [
-  "rich",
-  "rich-click",
-  "pyyaml",
-  "cytoolz",
-  "py-rattler",
-  "python-dateutil",
-  "jsonschema",
+  "rich>=14.2.0",
+  "rich-click>=1.9.0",
+  "pyyaml>=6.0.0",
+  "cytoolz>=1.1.0",
+  "py-rattler>=0.20.0",
+  "python-dateutil>=2.9.0",
+  "jsonschema>=4.25.0",
 ]
 dynamic = ["version"]
+
+[project.scripts]
+minimum-versions = "minimum_versions.main:main"
 
 [project.urls]
 Repository = "https://github.com/xarray-contrib/minimum-dependency-versions"
@@ -36,7 +40,7 @@ only-include = ["minimum_versions"]
 only-include = ["minimum_versions"]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py311"
 builtins = ["ellipsis"]
 exclude = [
   ".git",
@@ -80,3 +84,9 @@ branch = true
 [tool.coverage.report]
 show_missing = true
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING"]
+
+[dependency-groups]
+dev = [
+  "pytest>=9.0.2",
+  "pytest-cov>=7.0.0",
+]
