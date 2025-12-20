@@ -10,7 +10,7 @@ jobs:
   build:
     name: Build packages
     runs-on: ubuntu-latest
-    if: github.owner == 'xarray-contrib'
+    if: github.repository_owner == 'xarray-contrib'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
