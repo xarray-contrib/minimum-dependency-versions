@@ -1,5 +1,5 @@
 [project]
-name = "minimum-dependency-versions"
+name = "xarray-minimum-dependency-policy"
 authors = [
   { name = "Justus Magin" },
 ]
