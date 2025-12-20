@@ -1,9 +1,11 @@
 import datetime as dt
+import textwrap
+from io import StringIO
 
 import pytest
 from rattler import Version
 
-from minimum_versions.policy import Policy
+from minimum_versions.policy import Policy, parse_policy
 from minimum_versions.release import Release
 
 
@@ -51,4 +53,58 @@ def test_policy_minimum_version(package_name, policy, today, expected):
 
     actual = policy.minimum_version(today, package_name, releases[package_name])
 
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ["content", "expected"],
+    (
+        pytest.param(
+            """\
+            channels: [conda-forge]
+            platforms: [noarch]
+            policy:
+              packages:
+                numpy: 12
+              default: 6
+              overrides: {}
+              exclude: []
+              ignored_violations: []
+            """,
+            Policy(
+                {"numpy": 12},
+                6,
+                overrides={},
+                channels=["conda-forge"],
+                platforms=["noarch"],
+            ),
+            id="normal",
+        ),
+        pytest.param(
+            """\
+            channels: [conda-forge]
+            platforms: [noarch]
+            policy:
+              packages:
+                numpy: 12
+              default: 6
+              overrides:
+                scipy: "1.2.1"
+              exclude: []
+              ignored_violations: []
+            """,
+            Policy(
+                {"numpy": 12},
+                6,
+                overrides={"scipy": Version("1.2.1")},
+                channels=["conda-forge"],
+                platforms=["noarch"],
+            ),
+            id="overrides",
+        ),
+    ),
+)
+def test_parse_policy(content, expected):
+    f = StringIO(textwrap.dedent(content.rstrip()))
+    actual = parse_policy(f)
     assert actual == expected
