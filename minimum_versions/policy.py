@@ -78,7 +78,7 @@ class Policy:
 
     def minimum_version(self, today, package_name, releases):
         if (override := self.overrides.get(package_name)) is not None:
-            return find_release(releases, version=Version(override))
+            return find_release(releases, version=override)
 
         suitable_releases = [
             release for release in releases if is_suitable_release(release)
