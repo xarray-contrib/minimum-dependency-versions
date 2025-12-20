@@ -21,7 +21,9 @@ def lookup_spec_release(spec, releases):
 
 
 def version_comparison_symbol(required, policy):
-    if required < policy:
+    if required is None:
+        return "!"
+    elif required < policy:
         return "<"
     elif required > policy:
         return ">"
@@ -45,6 +47,7 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
         ">": Style(color="#ff0000", bold=True),
         "=": Style(color="#008700", bold=True),
         "<": Style(color="#d78700", bold=True),
+        "!": warning_style,
     }
 
     for spec in specs:
@@ -53,7 +56,13 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
         policy_date = policy_release.timestamp
 
         required_version = spec.version
-        required_date = lookup_spec_release(spec, releases).timestamp
+        if required_version is None:
+            warnings[spec.name].append(
+                "Unpinned dependency. Consider pinning or ignoring this dependency."
+            )
+            required_date = None
+        else:
+            required_date = lookup_spec_release(spec, releases).timestamp
 
         status = version_comparison_symbol(required_version, policy_version)
         if status == ">" and spec.name in ignored_violations:
@@ -63,8 +72,8 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
 
         table.add_row(
             spec.name,
-            str(required_version),
-            f"{required_date:%Y-%m-%d}",
+            str(required_version) if required_version is not None else "",
+            f"{required_date:%Y-%m-%d}" if required_date is not None else "",
             str(policy_version),
             f"{policy_date:%Y-%m-%d}",
             status,
