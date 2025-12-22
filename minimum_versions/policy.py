@@ -5,6 +5,7 @@ import jsonschema
 import yaml
 from dateutil.relativedelta import relativedelta
 from rattler import Version
+from tlz.dicttoolz import valmap
 
 schema = {
     "type": "object",
@@ -115,7 +116,7 @@ def parse_policy(f):
         package_months=package_policy["packages"],
         default_months=package_policy["default"],
         ignored_violations=package_policy["ignored_violations"],
-        overrides=package_policy["overrides"],
+        overrides=valmap(Version, package_policy["overrides"]),
     )
 
 
