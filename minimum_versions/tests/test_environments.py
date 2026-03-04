@@ -151,16 +151,14 @@ class TestCondaEnvironment:
         assert actual_warnings == expected_warnings
 
     def test_parse_environment(self, monkeypatch):
-        data = textwrap.dedent(
-            """\
+        data = textwrap.dedent("""\
             channels:
             - conda-forge
             dependencies:
             - a=1.1
             - b>=3.2
             - c=1.6.5
-            """.rstrip()
-        )
+            """.rstrip())
         monkeypatch.setattr(pathlib.Path, "read_text", lambda _: data)
 
         expected_specs = [
@@ -245,8 +243,7 @@ class TestPixiEnvironment:
         ["data", "path", "expected_specs", "expected_warnings"],
         (
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [dependencies]
                     a = "1.0.*"
                     b = "2.2.*"
@@ -256,8 +253,7 @@ class TestPixiEnvironment:
 
                     [environments]
                     env1 = { features = ["feature1"] }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pixi.toml",
                 [
                     Spec("a", Version("1.0")),
@@ -268,8 +264,7 @@ class TestPixiEnvironment:
                 id="default-feature",
             ),
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [dependencies]
                     a = "1.0.*"
                     b = "2.2.*"
@@ -279,31 +274,27 @@ class TestPixiEnvironment:
 
                     [environments]
                     env1 = { features = ["feature1"], no-default-feature = true }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pixi.toml",
                 [Spec("c", Version("3.1"))],
                 [("c", [])],
                 id="no-default-feature",
             ),
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [dependencies]
                     a = "1.0.*"
 
                     [environments]
                     env1 = { features = [] }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pixi.toml",
                 [Spec("a", Version("1.0"))],
                 [("a", [])],
                 id="missing-features",
             ),
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [dependencies]
                     a = "1.0.*"
 
@@ -312,16 +303,14 @@ class TestPixiEnvironment:
 
                     [environments]
                     env1 = { features = [] }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pixi.toml",
                 [Spec("a", Version("1.0"))],
                 [("feature:default", ["Ignored PyPI dependencies."]), ("a", [])],
                 id="pypi_dependencies-default",
             ),
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [dependencies]
                     a = "1.0.*"
 
@@ -330,31 +319,27 @@ class TestPixiEnvironment:
 
                     [environments]
                     env1 = { features = ["feat1"] }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pixi.toml",
                 [Spec("a", Version("1.0"))],
                 [("feature:feat1", ["Ignored PyPI dependencies."]), ("a", [])],
                 id="pypi_dependencies-feat1",
             ),
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [tool.pixi.feature.feature1.dependencies]
                     c = "3.1.*"
 
                     [tool.pixi.environments]
                     env1 = { features = ["feature1"], no-default-feature = true }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pyproject.toml",
                 [Spec("c", Version("3.1"))],
                 [("c", [])],
                 id="pyproject",
             ),
             pytest.param(
-                textwrap.dedent(
-                    """\
+                textwrap.dedent("""\
                     [package]
                     name = "a"
 
@@ -366,8 +351,7 @@ class TestPixiEnvironment:
 
                     [environments]
                     env1 = { features = ["feature1"] }
-                    """.rstrip()
-                ),
+                    """.rstrip()),
                 "pixi.toml",
                 [Spec("c", Version("3.1"))],
                 [("c", [])],
