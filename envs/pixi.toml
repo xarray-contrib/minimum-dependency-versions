@@ -11,7 +11,11 @@ python = "3.10"
 [feature.failing.dependencies]
 numpy = "2.1"
 
+[feature.exclude.dependencies]
+pytest = "!=9.1.0"
+
 [environments]
 env1 = { features = ["py310"] }
 env2 = ["py39"]
 failing-env = { features = ["failing"] }
+exclude-env = { features = ["exclude"] }

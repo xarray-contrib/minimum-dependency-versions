@@ -61,7 +61,8 @@ def validate(today, policy_file, manifest_path, environment_paths):
     }
 
     warnings = {
-        env: dict(warnings_) for env, (_, warnings_) in parsed_environments.items()
+        env: {n: w for n, w in warnings_ if n not in policy.exclude}
+        for env, (_, warnings_) in parsed_environments.items()
     }
     environments = {
         env: [spec for spec in specs if spec.name not in policy.exclude]
