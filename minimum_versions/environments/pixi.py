@@ -118,7 +118,7 @@ def parse_pixi_environment(name: str, manifest_path: pathlib.Path | None):
         (
             get_in([feature, "dependencies"], all_features, {})
             if feature != "default"
-            else pixi_config.get("dependencies", [])
+            else pixi_config.get("dependencies", {})
         )
         for feature in feature_names
     ]
