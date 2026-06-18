@@ -11,6 +11,7 @@ _version_re = r"[0-9]+\.[0-9]+(?:\.[0-9]+|\.\*)?"
 version_re = re.compile(f"(?P<version>{_version_re})")
 lower_pin_re = re.compile(rf">=(?P<version>{_version_re})$")
 tight_pin_re = re.compile(rf">=(?P<lower>{_version_re}),<(?P<upper>{_version_re})")
+exclusion_pin_re = re.compile(rf"!=(?P<excluded>{_version_re})$")
 
 
 def parse_spec(name, version_text: str | dict):
@@ -44,6 +45,13 @@ def parse_spec(name, version_text: str | dict):
         )
 
         raw_version = lower_pin
+    elif (match := exclusion_pin_re.match(version_text)) is not None:
+        excluded = match.group("excluded")
+        warnings.append(
+            f"Excluded version found: {excluded!r}. This is invalid for policy packages"
+            " and must be ignored explicitly."
+        )
+        raw_version = excluded
     else:
         raise ValueError(f"Unsupported version spec: {version_text}")
 
