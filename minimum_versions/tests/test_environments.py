@@ -357,6 +357,32 @@ class TestPixiEnvironment:
                 [("c", [])],
                 id="local_package",
             ),
+            pytest.param(
+                textwrap.dedent("""\
+                    [feature.feature1.dependencies]
+                    a = "!=1.0.1"
+
+                    [environments]
+                    env1 = { features = ["feature1"] }
+                    """.rstrip()),
+                "pixi.toml",
+                [
+                    Spec("a", Version("1.0.1")),
+                ],
+                [
+                    (
+                        "a",
+                        [
+                            (
+                                "Excluded version found: '1.0.1'. This is invalid for policy packages"
+                                " and must be ignored explicitly."
+                            ),
+                            "package should be pinned to a minor version (got 1.0.1)",
+                        ],
+                    )
+                ],
+                id="excluded_version",
+            ),
         ),
     )
     def test_parse_pixi_environment(
