@@ -90,12 +90,18 @@ def format_bump_table(specs, policy_versions, releases, warnings, ignored_violat
         warning_table.add_column("Package")
         warning_table.add_column("Warning")
 
+        formatters = {
+            "indexed": lambda index, message: f"{index: 2d}. {message}",
+            "bare": lambda index, message: f"    {message}",
+        }
+
         for package, messages in warnings.items():
-            if not messages:
-                continue
-            warning_table.add_row(package, messages[0], style=warning_style)
-            for message in messages[1:]:
-                warning_table.add_row("", message, style=warning_style)
+            formatter = formatters["indexed" if len(messages) > 1 else "bare"]
+            for index, message in enumerate(messages, start=1):
+                key = "" if index > 1 else package
+                warning_table.add_row(
+                    key, formatter(index, message), style=warning_style
+                )
 
         grid.add_row("Warnings", warning_table)
 

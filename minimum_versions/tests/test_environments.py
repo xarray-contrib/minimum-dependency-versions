@@ -34,7 +34,7 @@ def test_parse_environment(specifier, manifest_path, key, monkeypatch):
 
 
 @pytest.mark.parametrize(
-    ["envs", "ignored_violations", "expected"],
+    ["envs", "ignored_violations", "expected", "expected_warnings"],
     (
         pytest.param(
             {
@@ -46,6 +46,7 @@ def test_parse_environment(specifier, manifest_path, key, monkeypatch):
             },
             ["d"],
             {"env1": False},
+            {"env1": {}},
             id="single-violation-ignored",
         ),
         pytest.param(
@@ -55,23 +56,33 @@ def test_parse_environment(specifier, manifest_path, key, monkeypatch):
             },
             [],
             {"env1": True, "env2": False},
+            {"env1": {}, "env2": {}},
             id="multiple-split-not ignored",
         ),
         pytest.param(
             {"env1": [Spec("d", None)]},
             [],
             {"env1": True},
+            {"env1": {}},
             id="single-none-not ignored",
         ),
         pytest.param(
             {"env1": [Spec("d", None)]},
             ["d"],
             {"env1": False},
+            {"env1": {}},
             id="single-none-ignored",
+        ),
+        pytest.param(
+            {"env1": [Spec("a", Version("1.2"))]},
+            ["a"],
+            {"env1": False},
+            {"env1": {"a": ["violation unnecessarily ignored"]}},
+            id="single-none-unnecessary_ignore",
         ),
     ),
 )
-def test_compare_versions(envs, ignored_violations, expected):
+def test_compare_versions(envs, ignored_violations, expected, expected_warnings):
     policy_versions = {
         "a": FakeRecord(version=Version("1.2")),
         "b": FakeRecord(version=Version("3.1")),
@@ -79,10 +90,11 @@ def test_compare_versions(envs, ignored_violations, expected):
         "d": FakeRecord(version=Version("0.5")),
     }
 
-    actual = environments.spec.compare_versions(
+    actual, actual_warnings = environments.spec.compare_versions(
         envs, policy_versions, ignored_violations
     )
     assert actual == expected
+    assert actual_warnings == expected_warnings
 
 
 class TestCondaEnvironment:

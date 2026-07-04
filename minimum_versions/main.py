@@ -8,6 +8,7 @@ import rich_click as click
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from tlz.dicttoolz import merge_with
 from tlz.itertoolz import concat, unique
 
 from minimum_versions.environments import compare_versions, parse_environment
@@ -35,6 +36,16 @@ class _Path(click.Path):
         return super().convert(value, param, ctx)
 
 
+def merge_warnings(*warnings):
+    def merge_lists(v):
+        return list(concat(v))
+
+    def merge_env(values):
+        return merge_with(merge_lists, *values)
+
+    return merge_with(merge_env, *warnings)
+
+
 @click.group()
 def main():
     pass
@@ -60,7 +71,7 @@ def validate(today, policy_file, manifest_path, environment_paths):
         for path in environment_paths
     }
 
-    warnings = {
+    spec_warnings = {
         env: {n: w for n, w in warnings_ if n not in policy.exclude}
         for env, (_, warnings_) in parsed_environments.items()
     }
@@ -84,11 +95,16 @@ def validate(today, policy_file, manifest_path, environment_paths):
 
     policy_versions = find_policy_versions(policy, today, package_releases)
 
-    status = compare_versions(environments, policy_versions, policy.ignored_violations)
+    status, violation_warnings = compare_versions(
+        environments, policy_versions, policy.ignored_violations
+    )
+
+    warnings = merge_warnings(spec_warnings, violation_warnings)
 
     release_lookup = {
         n: {r.version: r for r in releases} for n, releases in package_releases.items()
     }
+
     grids = {
         env: format_bump_table(
             specs,
