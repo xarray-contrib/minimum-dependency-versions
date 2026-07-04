@@ -3,6 +3,7 @@ import datetime
 from dataclasses import dataclass, field
 
 from rattler import Gateway, Version
+from rattler.networking import Client
 from tlz.functoolz import curry, pipe
 from tlz.itertoolz import concat, groupby
 
@@ -47,7 +48,7 @@ def deduplicate_releases(package_info):
 
 
 def fetch_releases(channels, platforms, all_packages):
-    gateway = Gateway()
+    gateway = Gateway(client=Client.default_client(timeout=120))
 
     query = gateway.query(channels, platforms, all_packages, recursive=False)
     records = asyncio.run(query)
