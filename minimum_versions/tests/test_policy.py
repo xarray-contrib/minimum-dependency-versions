@@ -30,6 +30,20 @@ from minimum_versions.release import Release
             dt.date(2024, 9, 5),
             Release(Version("1.1.1"), 0, dt.datetime(2023, 12, 1)),
         ),
+        pytest.param(
+            "netcdf4",
+            Policy({}, 12, {}),
+            dt.date(2025, 9, 1),
+            Release(Version("1.7.1"), 0, dt.datetime(2024, 6, 18)),
+            id="no-x.y.0-release",
+        ),
+        pytest.param(
+            "netcdf4",
+            Policy({}, 12, {}),
+            dt.date(2024, 9, 1),
+            Release(Version("1.6.0"), 0, dt.datetime(2022, 6, 29)),
+            id="no-x.y.0-release-too-recent",
+        ),
     ),
 )
 def test_policy_minimum_version(package_name, policy, today, expected):
@@ -48,6 +62,13 @@ def test_policy_minimum_version(package_name, policy, today, expected):
             Release(Version("1.1.1"), 0, dt.datetime(2023, 12, 1)),
             Release(Version("1.2.0"), 0, dt.datetime(2024, 1, 3)),
             Release(Version("1.2.1"), 0, dt.datetime(2024, 2, 5)),
+        ],
+        "netcdf4": [
+            Release(Version("1.6.0"), 0, dt.datetime(2022, 6, 29)),
+            Release(Version("1.6.5"), 0, dt.datetime(2023, 10, 20)),
+            Release(Version("1.7.0rc1"), 0, dt.datetime(2024, 5, 1)),
+            Release(Version("1.7.1"), 0, dt.datetime(2024, 6, 18)),
+            Release(Version("1.7.2"), 0, dt.datetime(2024, 10, 22)),
         ],
     }
 
