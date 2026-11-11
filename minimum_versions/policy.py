@@ -58,9 +58,21 @@ def is_suitable_release(release):
     if release.timestamp is None:
         return False
 
-    segments = release.version.extend_to_length(3).segments()
+    segments = release.version.segments()
 
-    return segments[2] == [0]
+    return all(isinstance(part, int) for segment in segments for part in segment)
+
+
+def first_release_of_each_minor(releases):
+    # not every minor version has a x.y.0 release (e.g. netcdf4 1.7 starts at
+    # 1.7.1), so use the first release of each minor version instead
+    first_releases = {}
+    for release in sorted(releases):
+        segments = release.version.extend_to_length(2).segments()
+        minor = tuple(tuple(segment) for segment in segments[:2])
+        first_releases.setdefault(minor, release)
+
+    return sorted(first_releases.values(), key=lambda release: release.timestamp)
 
 
 @dataclass
@@ -80,9 +92,9 @@ class Policy:
         if (override := self.overrides.get(package_name)) is not None:
             return find_release(releases, version=override)
 
-        suitable_releases = [
+        suitable_releases = first_release_of_each_minor(
             release for release in releases if is_suitable_release(release)
-        ]
+        )
         if not suitable_releases:
             raise ValueError(f"Cannot find valid releases for {package_name}")
 
